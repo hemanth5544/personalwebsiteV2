@@ -1,0 +1,687 @@
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+
+// Generic hover code popover with typing and output for multiple languages
+export default function CodeHover({
+  children,
+  lang = "c",
+  position = "top",
+  charsPerTick = 3,
+  intervalMs = 18,
+  outputDelayMs = 150,
+}) {
+  const [hovering, setHovering] = useState(false)
+  const [count, setCount] = useState(0)
+  const [showOutput, setShowOutput] = useState(false)
+  const timerRef = useRef(null)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
+  const [mobileMode, setMobileMode] = useState(false)
+  const triggerRef = useRef(null)
+  const popupRef = useRef(null)
+  const [posStyle, setPosStyle] = useState({ top: 0, left: 0 })
+  const idRef = useRef(Symbol('codehover'))
+
+  // Detect touch devices
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
+    const computeMobile = () => setMobileMode(window.innerWidth < 640 || ('ontouchstart' in window || navigator.maxTouchPoints > 0))
+    computeMobile()
+    window.addEventListener('resize', computeMobile)
+    return () => window.removeEventListener('resize', computeMobile)
+  }, [])
+
+  const PRESETS = {
+
+    linux: {
+      label: "Linux",
+      tokens: [
+        { t: "# list and read\n", c: "text-zinc-500" },
+        { t: "ls -1\n", c: "text-zinc-300" },
+        { t: "echo ", c: "text-emerald-400" },
+        { t: "'Hello, Hemanth this side.'\n", c: "text-amber-300" },
+        { t: "cat README.md\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    git: {
+      label: "Git",
+      tokens: [
+        { t: "git init\n", c: "text-zinc-300" },
+        { t: "git add ", c: "text-zinc-300" },
+        { t: ".\n", c: "text-zinc-300" },
+        { t: "git commit -m ", c: "text-zinc-300" },
+        { t: "'Hello, Hemanth this side.'\n", c: "text-amber-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    vscode: {
+      label: "VS Code",
+      tokens: [
+        { t: "// launch workspace\n", c: "text-zinc-500" },
+        { t: "code ", c: "text-emerald-400" },
+        { t: ".\n", c: "text-zinc-300" },
+        { t: "// settings sync\n", c: "text-zinc-500" },
+        { t: "{\n  \"editor.fontLigatures\": true\n}\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    docker: {
+      label: "Docker",
+      tokens: [
+        { t: "docker build ", c: "text-zinc-300" },
+        { t: "-t app:dev ", c: "text-emerald-400" },
+        { t: ".\n", c: "text-zinc-300" },
+        { t: "docker run ", c: "text-zinc-300" },
+        { t: "--rm -p 3000:3000 app:dev\n", c: "text-emerald-400" },
+        { t: "# logs\n", c: "text-zinc-500" },
+        { t: "docker logs -f ", c: "text-zinc-300" },
+        { t: "$(docker ps -lq)\n", c: "text-emerald-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    firebase: {
+      label: "Firebase",
+      tokens: [
+        { t: "firebase login\n", c: "text-zinc-300" },
+        { t: "firebase init hosting\n", c: "text-zinc-300" },
+        { t: "firebase deploy\n", c: "text-zinc-300" },
+        { t: "echo ", c: "text-emerald-400" },
+        { t: "'Hello, Hemanth this side.'\n", c: "text-amber-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    aws: {
+      label: "AWS",
+      tokens: [
+        { t: "aws s3 mb s3://my-bucket\n", c: "text-zinc-300" },
+        { t: "aws s3 cp ", c: "text-zinc-300" },
+        { t: "index.html ", c: "text-emerald-400" },
+        { t: "s3://my-bucket/\n", c: "text-zinc-300" },
+        { t: "aws cloudfront create-invalidation --paths /*\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    vercel: {
+      label: "Vercel",
+      tokens: [
+        { t: "vercel login\n", c: "text-zinc-300" },
+        { t: "vercel init\n", c: "text-zinc-300" },
+        { t: "vercel deploy ", c: "text-zinc-300" },
+        { t: "--prod\n", c: "text-emerald-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    java: {
+      label: "Java",
+      tokens: [
+        { t: "public", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "class", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "Main", c: "text-emerald-400" },
+        { t: " {\n    ", c: "" },
+        { t: "public", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "static", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "void", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "main", c: "text-emerald-400" },
+        { t: "(String[] args)", c: "text-zinc-300" },
+        { t: " {\n        ", c: "" },
+        { t: "System.out.println", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")", c: "text-zinc-300" },
+        { t: ";\n    }\n}", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    python: {
+      label: "Python",
+      tokens: [
+        { t: "print", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    javascript: {
+      label: "JavaScript",
+      tokens: [
+        { t: "console", c: "text-emerald-400" },
+        { t: ".", c: "text-zinc-300" },
+        { t: "log", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")", c: "text-zinc-300" },
+        { t: ";\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    typescript: {
+      label: "TypeScript",
+      tokens: [
+        { t: "const", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "msg", c: "text-emerald-400" },
+        { t: ": string = ", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ";\n", c: "text-zinc-300" },
+        { t: "console", c: "text-emerald-400" },
+        { t: ".", c: "text-zinc-300" },
+        { t: "log", c: "text-emerald-400" },
+        { t: "(msg);\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    rust: {
+      label: "Rust",
+      tokens: [
+        { t: "fn", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "main", c: "text-emerald-400" },
+        { t: "() {\n    ", c: "text-zinc-300" },
+        { t: "println!", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ");\n}", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    go: {
+      label: "Go",
+      tokens: [
+        { t: "package", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "main\n", c: "text-emerald-400" },
+        { t: "import", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "\"fmt\"\n", c: "text-amber-300" },
+        { t: "func", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "main() {\n    ", c: "text-zinc-300" },
+        { t: "fmt.Println", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")\n}", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    html: {
+      label: "HTML5",
+      tokens: [
+        { t: "<", c: "text-zinc-400" },
+        { t: "p", c: "text-purple-300" },
+        { t: ">", c: "text-zinc-400" },
+        { t: "Hello, Hemanth this side.", c: "text-zinc-200" },
+        { t: "</", c: "text-zinc-400" },
+        { t: "p", c: "text-purple-300" },
+        { t: ">\n", c: "text-zinc-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    css: {
+      label: "CSS3",
+      tokens: [
+        { t: ".greet::after", c: "text-emerald-300" },
+        { t: " {\n  ", c: "text-zinc-300" },
+        { t: "content", c: "text-purple-300" },
+        { t: ": ", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ";\n}", c: "text-zinc-300" },
+        { t: "\n", c: "" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    bootstrap: {
+      label: "Bootstrap",
+      tokens: [
+        { t: "<", c: "text-zinc-400" },
+        { t: "div", c: "text-purple-300" },
+        { t: " class=\"alert alert-primary\"", c: "text-emerald-300" },
+        { t: ">", c: "text-zinc-400" },
+        { t: "Hello, Hemanth this side.", c: "text-zinc-200" },
+        { t: "</", c: "text-zinc-400" },
+        { t: "div", c: "text-purple-300" },
+        { t: ">\n", c: "text-zinc-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    react: {
+      label: "React",
+      tokens: [
+        { t: "function", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "App", c: "text-emerald-400" },
+        { t: "() {\n  ", c: "text-zinc-300" },
+        { t: "return", c: "text-purple-400" },
+        { t: " (\n    ", c: "text-zinc-300" },
+        { t: "<span className=\"text-emerald-300\">", c: "text-zinc-400" },
+        { t: "Hello, Hemanth this side.", c: "text-zinc-200" },
+        { t: "</span>", c: "text-zinc-400" },
+        { t: "\n  );\n}", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    tailwind: {
+      label: "Tailwind",
+      tokens: [
+        { t: "<", c: "text-zinc-400" },
+        { t: "div", c: "text-purple-300" },
+        { t: " class=\"text-emerald-400 font-medium\"", c: "text-emerald-300" },
+        { t: ">", c: "text-zinc-400" },
+        { t: "Hello, Hemanth this side.", c: "text-zinc-200" },
+        { t: "</", c: "text-zinc-400" },
+        { t: "div", c: "text-purple-300" },
+        { t: ">\n", c: "text-zinc-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    nextjs: {
+      label: "Next.js",
+      tokens: [
+        { t: "export default function", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "Page", c: "text-emerald-400" },
+        { t: "() {\n  ", c: "text-zinc-300" },
+        { t: "return (\n    ", c: "text-zinc-300" },
+        { t: "<p>", c: "text-zinc-400" },
+        { t: "Hello, Hemanth this side.", c: "text-zinc-200" },
+        { t: "</p>", c: "text-zinc-400" },
+        { t: "\n  );\n}", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    prisma: {
+      label: "Prisma",
+      tokens: [
+        { t: "import", c: "text-purple-400" },
+        { t: " { PrismaClient } ", c: "text-zinc-300" },
+        { t: "from", c: "text-purple-400" },
+        { t: " '@prisma/client'\n", c: "text-amber-300" },
+        { t: "const", c: "text-purple-400" },
+        { t: " prisma = new PrismaClient()\n", c: "text-zinc-300" },
+        { t: "console.log", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    node: {
+      label: "Node.js",
+      tokens: [
+        { t: "console", c: "text-emerald-400" },
+        { t: ".", c: "text-zinc-300" },
+        { t: "log", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    express: {
+      label: "Express.js",
+      tokens: [
+        { t: "import", c: "text-purple-400" },
+        { t: " express ", c: "text-zinc-300" },
+        { t: "from", c: "text-purple-400" },
+        { t: " 'express'\n", c: "text-amber-300" },
+        { t: "const app = express()\n", c: "text-zinc-300" },
+        { t: "app.get('/', (req, res) => res.send(", c: "text-zinc-300" },
+        { t: "'Hello, Hemanth this side.'", c: "text-amber-300" },
+        { t: "))\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    mongodb: {
+      label: "MongoDB",
+      tokens: [
+        { t: "// insert + fetch\n", c: "text-zinc-500" },
+        { t: "await ", c: "text-zinc-300" },
+        { t: "db", c: "text-emerald-400" },
+        { t: ".collection(\"greet\").insertOne({ msg: ", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: " })\n", c: "text-zinc-300" },
+        { t: "const doc = await db.collection(\"greet\").findOne({})\n", c: "text-zinc-300" },
+        { t: "console.log(doc.msg)\n", c: "text-emerald-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    mysql: {
+      label: "MySQL",
+      tokens: [
+        { t: "-- insert + query\n", c: "text-zinc-500" },
+        { t: "INSERT INTO greetings(msg) VALUES (", c: "text-zinc-300" },
+        { t: "'Hello, Hemanth this side.'", c: "text-amber-300" },
+        { t: ");\n", c: "text-zinc-300" },
+        { t: "SELECT msg FROM greetings ORDER BY id DESC LIMIT 1;\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    postgresql: {
+      label: "PostgreSQL",
+      tokens: [
+        { t: "-- insert + query\n", c: "text-zinc-500" },
+        { t: "INSERT INTO greetings(msg) VALUES (", c: "text-zinc-300" },
+        { t: "'Hello, Hemanth this side.'", c: "text-amber-300" },
+        { t: ") RETURNING id;\n", c: "text-zinc-300" },
+        { t: "SELECT msg FROM greetings ORDER BY id DESC LIMIT 1;\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    socket:{
+      label: "Socket.io",
+      tokens: [
+        { t: "import", c: "text-purple-400" },
+        { t: " { io } ", c: "text-zinc-300" },
+        { t: "from", c: "text-purple-400" },
+        { t: " 'socket.io-client'\n", c: "text-amber-300" },
+        { t: "const socket = io('http://localhost:3000')\n", c: "text-zinc-300" },
+        { t: "socket.on('greet', (msg) => ", c: "text-zinc-300" },
+        { t: "console.log(msg)\n", c: "text-emerald-400" },
+        { t: ")\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    sequelize:{
+      label: "Sequelize",
+      tokens: [
+        { t: "import", c: "text-purple-400" },
+        { t: " { Sequelize, DataTypes } ", c: "text-zinc-300" },
+        { t: "from", c: "text-purple-400" },
+        { t: " 'sequelize'\n", c: "text-amber-300" },
+        { t: "const sequelize = new Sequelize('database', 'username', 'password', { dialect: 'sqlite' })\n", c: "text-zinc-300" },
+        { t: "const Greeting = sequelize.define('Greeting', { msg: DataTypes.STRING })\n", c: "text-zinc-300" },
+        { t: "await Greeting.create({ msg: ", c: "text-zinc-300" },
+        { t: "'Hello, Hemanth this side.'", c: "text-amber-300" },
+        { t: " })\n", c: "text-zinc-300" },
+        { t: "const greet = await Greeting.findOne({ order: [['id', 'DESC']] })\n", c: "text-zinc-300" },
+        { t: "console.log(greet.msg)\n", c: "text-emerald-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    nestjs:{
+      label: "NestJS",
+      tokens: [
+        { t: "import", c: "text-purple-400" },
+        { t: " { Controller, Get } ", c: "text-zinc-300" },
+        { t: "from", c: "text-purple-400" },
+        { t: " '@nestjs/common'\n", c: "text-amber-300" },
+        { t: "@Controller()", c: "text-emerald-400" },
+        { t: "\nexport class AppController {\n  ", c: "text-zinc-300" },
+        { t: "@Get()", c: "text-emerald-400" },
+        { t: "\n  getHello(): string {\n    ", c: "text-zinc-300" },
+        { t: "return ", c: "text-purple-400" },
+        { t: "\"Hello, Hemanth this side.\"\n  }\n}", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    graphql:{
+      label: "GraphQL",
+      tokens: [
+        { t: "type", c: "text-purple-400" },
+        { t: " ", c: "" },
+        { t: "Query", c: "text-emerald-400" },
+        { t: " {\n  ", c: "text-zinc-300" },
+        { t: "greet", c: "text-emerald-400" },
+        { t: ": String\n}", c: "text-zinc-300" },
+        { t: "\n\n", c: "" },
+        { t: "{\n  ", c: "text-zinc-300" },
+        { t: "greet\n", c: "text-emerald-400" },
+        { t: "}\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    redis:{
+      label: "Redis", 
+      tokens: [
+        { t: "SET ", c: "text-zinc-300" },
+        { t: "greet ", c: "text-emerald-400" },
+        { t: "'Hello, Hemanth this side.'\n", c: "text-amber-300" },
+        { t: "GET ", c: "text-zinc-300" },
+        { t: "greet\n", c: "text-emerald-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    kafka:{
+      label: "Kafka",
+      tokens: [
+        { t: "import", c: "text-purple-400" },
+        { t: " { Kafka } ", c: "text-zinc-300" },
+        { t: "from", c: "text-purple-400" },
+        { t: " 'kafkajs'\n", c: "text-amber-300" },
+        { t: "const kafka = new Kafka({ clientId: 'app', brokers: ['localhost:9092'] })\n", c: "text-zinc-300" },
+        { t: "const producer = kafka.producer()\n", c: "text-zinc-300" },
+        { t: "await producer.connect()\n", c: "text-zinc-300" },
+        { t: "await producer.send({ topic: 'greetings', messages: [ { value: ", c: "text-zinc-300" },
+        { t: "'Hello, Hemanth this side.'", c: "text-amber-300" },
+        { t: " } ] })\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    jest:{
+      label: "Jest",
+      tokens: [
+        { t: "test", c: "text-purple-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "'greet test'", c: "text-emerald-400" },
+        { t: ", () => {\n  ", c: "text-zinc-300" },
+        { t: "expect", c: "text-purple-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ").toBe(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"\n})\n", c: "text-amber-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    elasticsearch:{
+      label: "Elasticsearch",
+      tokens: [
+        { t: "PUT ", c: "text-zinc-300" },
+        { t: "/greetings/_doc/1\n", c: "text-emerald-400" },
+        { t: "{ \"msg\": ", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: " }\n\n", c: "" },
+        { t: "GET ", c: "text-zinc-300" },
+        { t: "/greetings/_doc/1\n", c: "text-emerald-400" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    deno:{
+      label: "Deno",
+      tokens: [
+        { t: "console", c: "text-emerald-400" },
+        { t: ".", c: "text-zinc-300" },
+        { t: "log", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    bun:{
+      label: "Bun",
+      tokens: [   
+        { t: "console", c: "text-emerald-400" },
+        { t: ".", c: "text-zinc-300" },
+        { t: "log", c: "text-emerald-400" },
+        { t: "(", c: "text-zinc-300" },
+        { t: "\"Hello, Hemanth this side.\"", c: "text-amber-300" },
+        { t: ")\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    electron:{
+      label: "Electron",
+      tokens: [
+        { t: "import", c: "text-purple-400" },
+        { t: " { app, BrowserWindow } ", c: "text-zinc-300" },
+        { t: "from", c: "text-purple-400" },
+        { t: " 'electron'\n", c: "text-amber-300" },
+        { t: "app.whenReady().then(() => {\n  ", c: "text-zinc-300" },
+        { t: "const win = new BrowserWindow()\n  ", c: "text-zinc-300" },
+        { t: "win.loadURL('data:text/html,<h1>Hello, Hemanth this side.</h1>')\n", c: "text-zinc-300" },
+        { t: "})\n", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+    nginx:{
+      label: "Nginx",
+      tokens: [
+        { t: "server {\n  ", c: "text-zinc-300" },
+        { t: "listen ", c: "text-purple-400" },
+        { t: "80;\n  ", c: "text-zinc-300" },
+        { t: "location / {\n    ", c: "text-zinc-300" },
+        { t: "return ", c: "text-purple-400" },
+        { t: "200 ", c: "text-emerald-400" },
+        { t: "'Hello, Hemanth this side.';\n  }\n}", c: "text-zinc-300" },
+      ],
+      output: "Hello, Hemanth this side.",
+    },
+  
+  }
+
+  const preset = PRESETS[lang] || PRESETS.c
+  const tokens = preset.tokens
+  const label = preset.label
+  const outputText = preset.output
+
+  const fullLength = tokens.reduce((n, tok) => n + tok.t.length, 0)
+
+  useEffect(() => {
+    if (hovering) {
+      timerRef.current = setInterval(() => {
+        setCount((c) => Math.min(c + charsPerTick, fullLength))
+      }, intervalMs)
+    } else {
+      clearInterval(timerRef.current)
+      setCount(0)
+      setShowOutput(false)
+    }
+    return () => clearInterval(timerRef.current)
+  }, [hovering, fullLength, charsPerTick, intervalMs])
+
+  useEffect(() => {
+    if (!hovering) return
+    if (count >= fullLength) {
+      const t = setTimeout(() => setShowOutput(true), outputDelayMs)
+      return () => clearTimeout(t)
+    }
+  }, [count, fullLength, hovering, outputDelayMs])
+
+  let remaining = count
+  const rendered = tokens.map((tok, idx) => {
+    if (remaining <= 0) return <span key={idx} className={tok.c}></span>
+    const take = Math.min(remaining, tok.t.length)
+    remaining -= take
+    return (
+      <span key={idx} className={tok.c}>
+        {tok.t.slice(0, take)}
+      </span>
+    )
+  })
+
+  const posClasses = position === "top"
+    ? "bottom-full left-1/2 -translate-x-1/2 mb-3"
+    : "top-full left-1/2 -translate-x-1/2 mt-3"
+
+  const statusText = count >= fullLength ? 'done' : 'typing…'
+
+  // For touch devices, show the popup on click instead of hover
+  const handleInteraction = () => {
+    if (isTouchDevice) {
+      const next = !hovering
+      if (next) {
+        // Tell other instances to close
+        window.dispatchEvent(new CustomEvent('codehover-open', { detail: idRef.current }))
+      }
+      setHovering(next)
+    }
+  }
+
+  // Close this instance when another opens
+  useEffect(() => {
+    const onOpen = (e) => {
+      if (e.detail !== idRef.current) setHovering(false)
+    }
+    window.addEventListener('codehover-open', onOpen)
+    return () => window.removeEventListener('codehover-open', onOpen)
+  }, [])
+
+  // When visible on mobile, compute fixed coordinates near the trigger
+  useEffect(() => {
+    if (!hovering || !mobileMode) return
+    const compute = () => {
+      const el = triggerRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const gap = 12
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      const margin = 8
+      const w = Math.min(popupRef.current?.offsetWidth || 340, Math.floor(vw * 0.92))
+      const h = Math.min(popupRef.current?.offsetHeight || 240, Math.floor(vh * 0.6))
+      const cx = rect.left + rect.width / 2
+      const clampedLeft = Math.min(Math.max(cx - w / 2, margin), vw - margin - w)
+      let top = rect.bottom + gap; // Prefer below
+      if (top > vh - margin - h) {
+        top = rect.top - gap - h; // Flip to above if no space
+      }
+      top = Math.min(Math.max(top, margin), vh - margin - h)
+      setPosStyle({ top, left: clampedLeft })
+    }
+    compute()
+    // Recompute on next frame to capture measured popup sizes
+    const raf = requestAnimationFrame(compute)
+    window.addEventListener('scroll', compute, { passive: true })
+    window.addEventListener('resize', compute)
+    return () => {
+      window.removeEventListener('scroll', compute)
+      window.removeEventListener('resize', compute)
+      cancelAnimationFrame(raf)
+    }
+  }, [hovering, mobileMode, position])
+
+  return (
+    <div
+      ref={triggerRef}
+      className="relative group inline-flex"
+      onMouseEnter={() => !isTouchDevice && setHovering(true)}
+      onMouseLeave={() => !isTouchDevice && setHovering(false)}
+      onClick={handleInteraction}
+      data-no-letter
+    >
+      {children}
+      {hovering && (
+        <div
+          ref={popupRef}
+          className={`${mobileMode ? 'fixed' : 'absolute ' + posClasses} z-[60]`}
+          style={mobileMode ? { top: posStyle.top, left: posStyle.left } : undefined}
+          aria-hidden={!mobileMode}
+          role={mobileMode ? 'dialog' : undefined}
+        >
+          <div className="w-[340px] max-w-[92vw] sm:max-w-[90vw] rounded-lg border border-zinc-700 bg-zinc-900/95 shadow-xl backdrop-blur px-4 py-3 animate-fade-in-up">
+            <div className="text-xs text-zinc-400 mb-2 font-mono">{label} • {statusText}</div>
+            <pre className="text-[12px] leading-5 text-zinc-200 font-mono whitespace-pre-wrap break-all max-h-[40vh] overflow-auto pr-1">
+              {rendered}
+              {count < fullLength && <span className="inline-block w-2 h-4 bg-zinc-200 align-baseline ml-0.5 animate-pulse" />}
+            </pre>
+            <div className="mt-3 border-t border-zinc-700 pt-2">
+              <div className="text-[11px] text-zinc-400 font-mono mb-1">Output</div>
+              <div className="text-[12px] font-mono text-emerald-300 break-words">
+                {showOutput ? outputText : <span className="text-zinc-500">(waiting...)</span>}
+              </div>
+              {mobileMode && (
+                <div className="mt-2 text-[10px] text-zinc-500 font-mono text-center">Tap again to close</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
