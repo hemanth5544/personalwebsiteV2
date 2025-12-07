@@ -1,15 +1,15 @@
-let userConfig = undefined
+let userConfig;
 try {
-  userConfig = await import('./v0-user-next.config')
+  userConfig = await import('./v0-user-next.config');
 } catch (e) {
   // ignore error
 }
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // output: 'export', // REMOVE for server build
+  // distDir: 'out',   // REMOVE for server build
   trailingSlash: true,
-  distDir: 'out',
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -24,31 +24,21 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-  dev: {
-    allowedDevOrigins: ['*'],  // Allow all origins
-  },
-}
+  allowedDevOrigins: ['*'], 
+};
 
-mergeConfig(nextConfig, userConfig)
+mergeConfig(nextConfig, userConfig);
 
 function mergeConfig(nextConfig, userConfig) {
-  if (!userConfig) {
-    return
-  }
+  if (!userConfig) return;
 
   for (const key in userConfig) {
-    if (
-      typeof nextConfig[key] === 'object' &&
-      !Array.isArray(nextConfig[key])
-    ) {
-      nextConfig[key] = {
-        ...nextConfig[key],
-        ...userConfig[key],
-      }
+    if (typeof nextConfig[key] === 'object' && !Array.isArray(nextConfig[key])) {
+      nextConfig[key] = { ...nextConfig[key], ...userConfig[key] };
     } else {
-      nextConfig[key] = userConfig[key]
+      nextConfig[key] = userConfig[key];
     }
   }
 }
 
-export default nextConfig
+export default nextConfig;
