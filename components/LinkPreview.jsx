@@ -11,7 +11,7 @@ export default function LinkPreview({ children, title, subtitle, href, avatar, p
 
   // Compute fixed coordinates so the preview is portaled outside any <p>
   useEffect(() => {
-    if (!hovering) return
+    if (!hovering || typeof window === 'undefined') return
     const compute = () => {
       const el = triggerRef.current
       if (!el) return
@@ -50,7 +50,7 @@ export default function LinkPreview({ children, title, subtitle, href, avatar, p
       data-no-letter
     >
       {children}
-      {hovering && createPortal(
+      {hovering && typeof document !== 'undefined' && createPortal(
         <div
           ref={popupRef}
           className={`fixed z-50`}

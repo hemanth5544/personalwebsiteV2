@@ -24,6 +24,7 @@ export default function CodeHover({
 
   // Detect touch devices
   useEffect(() => {
+    if (typeof window === 'undefined') return
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
     const computeMobile = () => setMobileMode(window.innerWidth < 640 || ('ontouchstart' in window || navigator.maxTouchPoints > 0))
     computeMobile()
@@ -593,7 +594,7 @@ export default function CodeHover({
 
   // For touch devices, show the popup on click instead of hover
   const handleInteraction = () => {
-    if (isTouchDevice) {
+    if (isTouchDevice && typeof window !== 'undefined') {
       const next = !hovering
       if (next) {
         // Tell other instances to close
@@ -605,6 +606,7 @@ export default function CodeHover({
 
   // Close this instance when another opens
   useEffect(() => {
+    if (typeof window === 'undefined') return
     const onOpen = (e) => {
       if (e.detail !== idRef.current) setHovering(false)
     }
@@ -614,7 +616,7 @@ export default function CodeHover({
 
   // When visible on mobile, compute fixed coordinates near the trigger
   useEffect(() => {
-    if (!hovering || !mobileMode) return
+    if (!hovering || !mobileMode || typeof window === 'undefined') return
     const compute = () => {
       const el = triggerRef.current
       if (!el) return

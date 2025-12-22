@@ -10,11 +10,12 @@ export default function GithubCalendarClient({
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
+    if (typeof document === 'undefined') return
     const classBased = document.documentElement.classList.contains("dark");
     const saved = classBased
       ? "dark"
       : document.documentElement.getAttribute("data-theme") ||
-        localStorage.getItem("theme") ||
+        (typeof localStorage !== 'undefined' ? localStorage.getItem("theme") : null) ||
         "light";
 
     setTheme(saved);

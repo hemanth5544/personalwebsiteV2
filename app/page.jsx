@@ -42,6 +42,7 @@ export default function Page() {
   }
 
   const triggerRandomLetterEffect = () => {
+    if (typeof document === 'undefined') return
     const letters = document.querySelectorAll('.letter');
     if (letters.length === 0) return;
     
@@ -99,6 +100,7 @@ export default function Page() {
   };
 
   useEffect(() => {
+    if (typeof document === 'undefined') return
     const handleGlobalClick = (e) => {
       const target = e.target;
       if (target && target.closest && target.closest('[data-no-letter]')) return;
@@ -113,6 +115,7 @@ export default function Page() {
   }, [])
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
     const calcProgress = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
@@ -553,7 +556,7 @@ export default function Page() {
           ].map((project, index) => (
             <div
               key={project.title}
-              onClick={() => window.open(project.github, "_blank")}
+              onClick={() => typeof window !== 'undefined' && window.open(project.github, "_blank")}
               onMouseEnter={() => setHoveredProject(index)}
               onMouseLeave={() => setHoveredProject(null)}
               className={`relative p-4 sm:p-6 rounded-xl bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-700 transition-all duration-300 cursor-pointer ${
