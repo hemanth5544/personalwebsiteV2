@@ -310,6 +310,18 @@ export default function Page() {
           </section>
         <Oneko/>
 
+
+         <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+        <h2 className="text-xl sm:text-2xl md:text-3xl text-center font-medium text-purple-900 dark:text-white">
+          Open Source Contributions
+        </h2>
+
+        <div className="px-4 sm:px-6 lg:px-8">
+                    <OpenSourceContributionsCard />
+                  </div>
+        </section>
+
+
         {/* Technical Skills Section */}
         <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-center text-zinc-900 dark:text-white">
@@ -584,17 +596,7 @@ export default function Page() {
         </div>
 
         </section>
-
-        <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-        <h2 className="text-xl sm:text-2xl md:text-3xl text-center font-medium text-zinc-900 dark:text-white">
-          Open Source Contributions
-        </h2>
-
-        {/* <div className="px-4 sm:px-6 lg:px-8"> */}
-                    <OpenSourceContributionsCard />
-                  {/* </div> */}
-        </section>
-
+        
         <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-zinc-900 dark:text-white">
             Get in touch

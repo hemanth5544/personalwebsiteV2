@@ -84,37 +84,43 @@ export default function OpenSourceContributionsCard() {
             transition={{ duration: 0.4, delay: index * 0.1 }}
             className="group"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  {contribution.state === 'merged' && (
-                <GitMerge
-                  className="w-8 h-8 stroke-current fill-none"
-                  strokeWidth={1.5}
-                  color={theme === 'dark' ? '#c4b5fd' : '#8b5cf6'}
-                  style={{ stroke: 'currentColor' }}
-                />
-                  )}
-                  <h4 className="text-lg text-neutral-800 dark:text-neutral-200 group-hover:text-[#006FEE] transition-colors duration-200">
-                    {contribution.title}
-                  </h4>
-                  <span className="text-s text-neutral-500 dark:text-neutral-400">{contribution.date}</span>
+           <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-1 gap-3 min-w-0">
+
+                {contribution.state === 'merged' && (
+                  <GitMerge className="mt-1 text-xl sm:text-2xl md:text-3xl text-purple-900 dark:text-purple-600 flex-shrink-0" />
+                )}
+
+                 <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h4 className="text-xl text-neutral-800 dark:text-neutral-200 group-hover:text-[#006FEE] transition-colors duration-200">
+                      {contribution.title}
+                    </h4>
+                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                      {contribution.date}
+                    </span>
+                  </div>
+
+                  <p className="text-md text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                    {contribution.description}
+                  </p>
                 </div>
-                
-                <p className="text-md text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                  {contribution.description}
-                </p>
               </div>
-              
+
               <Link
                 href={contribution.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-shrink-0 p-2 rounded-lg bg-neutral-200 border-2 border-neutral-500 dark:bg-neutral-800 dark:border-neutral-500 hover:opacity-70 transition-all duration-200"
+                className="flex-shrink-0 p-2 rounded-lg 
+                          bg-neutral-200 border-2 border-neutral-500
+                          dark:bg-neutral-800 dark:border-neutral-500
+                          hover:bg-purple-500 hover:border-purple-500
+                          transition-all duration-200 group"
               >
-                <ArrowUpRight className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                <ArrowUpRight className="w-4 h-4 text-neutral-600 dark:text-neutral-400 group-hover:text-white transition-colors" />
               </Link>
             </div>
+
             
             {index < displayedContributions.length - 1 && (
               <div className="mt-4 border-b border-neutral-300 dark:border-[#2E2E2E]" />
