@@ -22,7 +22,7 @@ interface Contribution {
 export default function OpenSourceContributionsCard() {
   const { theme } = useTheme()
   const [showAll, setShowAll] = useState(false)
-  const [contributions, setContributions] = useState<Contribution[]>(fallbackContributions)
+  const [contributions] = useState<Contribution[]>(fallbackContributions)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -30,12 +30,12 @@ export default function OpenSourceContributionsCard() {
       try {
         setLoading(true)
         
-        const response = await fetch('/api/github-contributions?username=hemanth5544&limit=50')
-        const data = await response.json()
+        // const response = await fetch('/api/github-contributions?username=hemanth5544&limit=50')
+        // const data = await response.json()
         
-        if (data.success && data.contributions.length > 0) {
-          setContributions(data.contributions)
-        }
+        // if (data.success && data.contributions.length > 0) {
+          // setContributions(data.contributions)
+        // }
       } catch (error) {
         console.error('Failed to load GitHub contributions:', error)
       } finally {
