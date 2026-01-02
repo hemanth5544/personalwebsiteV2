@@ -1,5 +1,5 @@
 // oneko.js: https://github.com/adryd325/oneko.js
-'use client' // Add this at the very top of your file
+'use client';
 
 (function oneko() {
   const isReducedMotion =

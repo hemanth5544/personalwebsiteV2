@@ -18,7 +18,7 @@ import githubAvatar from "@/assets/githubhemu.jpeg"
 import linkedinAvatar from "@/assets/linkhemu.png"
 import GithubCalendarClient from "@/components/gg"
 import {skillsData} from './data'
-
+import OpenSourceContributionsCard from "@/components/ContributionCard"
 export default function Page() {
   const { theme, setTheme } = useTheme()
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -310,6 +310,18 @@ export default function Page() {
           </section>
         <Oneko/>
 
+
+         <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+        <h2 className="text-xl sm:text-2xl md:text-3xl text-center font-medium text-purple-900 dark:text-white">
+          Open Source Contributions
+        </h2>
+
+        <div className="px-4 sm:px-6 lg:px-8">
+                    <OpenSourceContributionsCard />
+                  </div>
+        </section>
+
+
         {/* Technical Skills Section */}
         <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-center text-zinc-900 dark:text-white">
@@ -512,10 +524,17 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-auto">
           {[
             {
+              title: "QuickSync",
+              description:
+                "Quick Sync is a web‑based app for quickly sharing links, text snippets, and files Open the site on one device, scan the QR code with another, and you instantly get a private, end‑to‑end‑encrypted WebRTC tunnel with no installs, no sign‑ups, and no middleman servers ferrying your data"            ,
+              size: "large",
+              github: "https://github.com/hemanth5544/quicksync"
+            },
+            {
               title: "Order Execution Engine with retry logic and job mechanism",
               description:
                 "A high-performance order execution engine with DEX routing and real-time WebSocket status updates. Built for processing market, limit, and sniper orders on Solana DEXs (Raydium and Meteora).",
-              size: "large",
+              size: "medium",
               github: "https://github.com/hemanth5544/order-execution-engine"
             },
             {
@@ -524,13 +543,6 @@ export default function Page() {
                 "A production-ready TypeScript/Express API server with PostgreSQL database integration, type-safe API contracts, and automated OpenAPI documentation generation.",
               size: "medium",
               github: "https://github.com/hemanth5544/boiler-plate"
-            },
-            {
-              title: "Notifications Microservice",
-              description:
-                "A scalable notifications microservice built with Node.js, Express, and Postgres. Supports email, SMS, and push notifications with user preferences and scheduling capabilities.",
-              size: "small",
-              github: "https://github.com/hemanth5544/notifications-microservice"
             },
             {
               title: "Nalanda Library Management System",
@@ -582,8 +594,9 @@ export default function Page() {
             </div>
           ))}
         </div>
-        </section>
 
+        </section>
+        
         <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-zinc-900 dark:text-white">
             Get in touch
