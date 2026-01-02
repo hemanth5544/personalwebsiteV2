@@ -524,10 +524,17 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-auto">
           {[
             {
+              title: "QuickSync",
+              description:
+                "Quick Sync is a web‑based app for quickly sharing links, text snippets, and files Open the site on one device, scan the QR code with another, and you instantly get a private, end‑to‑end‑encrypted WebRTC tunnel with no installs, no sign‑ups, and no middleman servers ferrying your data"            ,
+              size: "large",
+              github: "https://github.com/hemanth5544/quicksync"
+            },
+            {
               title: "Order Execution Engine with retry logic and job mechanism",
               description:
                 "A high-performance order execution engine with DEX routing and real-time WebSocket status updates. Built for processing market, limit, and sniper orders on Solana DEXs (Raydium and Meteora).",
-              size: "large",
+              size: "medium",
               github: "https://github.com/hemanth5544/order-execution-engine"
             },
             {
@@ -536,13 +543,6 @@ export default function Page() {
                 "A production-ready TypeScript/Express API server with PostgreSQL database integration, type-safe API contracts, and automated OpenAPI documentation generation.",
               size: "medium",
               github: "https://github.com/hemanth5544/boiler-plate"
-            },
-            {
-              title: "Notifications Microservice",
-              description:
-                "A scalable notifications microservice built with Node.js, Express, and Postgres. Supports email, SMS, and push notifications with user preferences and scheduling capabilities.",
-              size: "small",
-              github: "https://github.com/hemanth5544/notifications-microservice"
             },
             {
               title: "Nalanda Library Management System",
