@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, ChevronDown, ChevronUp, GitMerge } from 'lucide-react'
 import { fallbackContributions } from './github'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 
 interface Contribution {
   title: string
@@ -49,6 +50,7 @@ export default function OpenSourceContributionsCard() {
   const displayedContributions = showAll ? contributions : contributions.slice(0, 3)
 
   return (
+    <TooltipProvider delayDuration={200}>
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -84,7 +86,9 @@ export default function OpenSourceContributionsCard() {
             transition={{ duration: 0.4, delay: index * 0.1 }}
             className="group"
           >
-           <div className="flex items-start justify-between gap-4">
+           <Tooltip>
+           <TooltipTrigger asChild>
+           <div className="flex items-start justify-between gap-4 cursor-help">
               <div className="flex flex-1 gap-3 min-w-0">
 
                 {contribution.state === 'merged' && (
@@ -120,6 +124,15 @@ export default function OpenSourceContributionsCard() {
                 <ArrowUpRight className="w-4 h-4 text-neutral-600 dark:text-neutral-400 group-hover:text-white transition-colors" />
               </Link>
             </div>
+           </TooltipTrigger>
+           <TooltipContent side="top" className="z-[9999] max-w-xs bg-neutral-900 dark:bg-neutral-800 border-neutral-700">
+              <div className="space-y-1.5">
+                <p className="font-semibold text-sm text-white">{contribution.repository}</p>
+                <p className="text-xs text-neutral-300">Type: <span className="capitalize">{contribution.type || 'N/A'}</span></p>
+                <p className="text-xs text-neutral-300">Status: <span className="capitalize">{contribution.state || 'N/A'}</span></p>
+              </div>
+            </TooltipContent>
+           </Tooltip>
 
             
             {index < displayedContributions.length - 1 && (
@@ -148,5 +161,6 @@ export default function OpenSourceContributionsCard() {
         </div>
       )}
     </motion.div>
+    </TooltipProvider>
   )
 }

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": " ^3.9.1",
@@ -23,6 +24,7 @@
     "react-dom": "^18",
     "react-github-calendar": "^5.0.0",
     "react-icons": "^5.5.0",
+    "react-tooltip": "^5.30.0",
     "skill-icons": "^0.0.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7"
