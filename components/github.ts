@@ -47,7 +47,18 @@ export interface ProcessedContribution {
   state: 'open' | 'closed' | 'merged'
 }
 export const fallbackContributions: ProcessedContribution[] = [
+
   {
+      
+    title: "feat: Selected actions to perform pause,resume work and a bulk-delete option",
+    description: "Added selected actions to perform pause, resume work and a bulk-delete option in Uptime Kuma.",
+    repository: "uptime-kuma",
+    link: "https://github.com/louislam/uptime-kuma/pull/6676",
+    date: "2025",
+    type: "feature",
+    state: "merged"
+  },
+  {    
     title: "fix: Remove active line background color in HtmlEditor",
     description: "Removed the active line background color in the HtmlEditor component to enhance user experience.",
     repository: "useplunk",
@@ -66,7 +77,7 @@ export const fallbackContributions: ProcessedContribution[] = [
     state: "merged"
   },
   {
-    title: "feat: RTSP (Real Time Streaming Protocol)) support",
+    title: "feat: RTSP (Real Time Streaming Protocol) support",
     description: "Added RTSP (Real Time Streaming Protocol) support to Uptime Kuma for enhanced monitoring capabilities.",
     repository: "uptime-kuma",
     link: "https://github.com/louislam/uptime-kuma/pull/5954",
