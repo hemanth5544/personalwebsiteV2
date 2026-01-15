@@ -58,19 +58,32 @@ export default function OpenSourceContributionsCard() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-3/4"></div>
-                    <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-12"></div>
+            <div key={i}>
+              <div className="flex items-start justify-between gap-4 animate-pulse">
+                <div className="flex gap-3 flex-1 min-w-0">
+                  {/* Icon skeleton */}
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 mt-1 bg-zinc-300 dark:bg-zinc-700 rounded flex-shrink-0" />
+                  
+                  <div className="flex-1 min-w-0 space-y-2">
+                    {/* Title and date */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="h-5 sm:h-6 bg-zinc-300 dark:bg-zinc-700 rounded w-2/3" />
+                      <div className="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-12" />
+                    </div>
+                    
+                    {/* Description */}
+                    <div className="space-y-2">
+                      <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-full" />
+                      <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4" />
+                    </div>
                   </div>
-                  <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-full mb-2"></div>
-                  <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-2/3"></div>
                 </div>
-                <div className="w-8 h-8 bg-neutral-200 dark:bg-neutral-700 rounded"></div>
+
+                {/* Arrow button skeleton */}
+                <div className="w-8 h-8 bg-zinc-300 dark:bg-zinc-700 rounded-lg flex-shrink-0" />
               </div>
-              {i < 3 && <div className="mt-4 border-b border-neutral-300 dark:border-[#2E2E2E]" />}
+              
+              {i < 3 && <div className="mt-4 border-b border-zinc-300 dark:border-zinc-700" />}
             </div>
           ))}
         </div>
