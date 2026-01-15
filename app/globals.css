@@ -31,6 +31,14 @@
     --color-neutral-500: #737373;
   }
 
+  * {
+    scroll-behavior: smooth;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   .dark {
     --background: 0 0% 0%;
     --foreground: 0 0% 98%;
