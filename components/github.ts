@@ -68,6 +68,16 @@ export const fallbackContributions: ProcessedContribution[] = [
     state: "merged"
   },
   {
+    title: "feat: New API endpoint to fetch bookings for standalone teams ",
+    description: "Added a new API endpoint to fetch bookings for standalone teams in the Plunk project.",
+    repository: "cal.com",
+    link: "https://github.com/calcom/cal.com/pull/26818/",
+    date: "2025",
+    type: "feature",
+    state: "open"
+
+  },
+  {
     title: " feat: select all monitors on the maintenance page ",
     description: "Implemented a feature to select all monitors on the maintenance page in Uptime Kuma.",
     repository: "uptime-kuma",
