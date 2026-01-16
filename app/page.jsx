@@ -19,6 +19,7 @@ import linkedinAvatar from "@/assets/linkhemu.png"
 import GithubCalendarClient from "@/components/gg"
 import {skillsData} from './data'
 import OpenSourceContributionsCard from "@/components/ContributionCard"
+import CheckMyGitPreview from "@/components/CheckMyGitPreview"
 export default function Page() {
   const { theme, setTheme } = useTheme()
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -305,9 +306,16 @@ export default function Page() {
         </section>
 
 
-        <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-        <GithubCalendarClient className="" username="hemanth5544" blockSize={13} />
-          </section>
+        <section className="space-y-6 sm:space-y-8 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-zinc-900 dark:text-white">
+              GitHub Contributions
+            </h2>
+            <CheckMyGitPreview username="hemanth5544" />
+          </div>
+          <GithubCalendarClient className="" username="hemanth5544" blockSize={13} />
+        </section>
+
         <Oneko/>
 
 
@@ -663,6 +671,8 @@ export default function Page() {
                 <span className="absolute bottom-0 left-0 w-0 h-px bg-zinc-400 dark:bg-zinc-500 group-hover:w-full transition-all duration-300 ease-out"></span>
               </button>
             </div>
+            
+  
           </div>
         </section>
 
