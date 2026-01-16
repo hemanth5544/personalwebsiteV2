@@ -672,10 +672,7 @@ export default function Page() {
               </button>
             </div>
             
-            {/* GitHub Analysis Badge */}
-            <div className="flex justify-center mt-8">
-              <CheckMyGitPreview username="hemanth5544" />
-            </div>
+  
           </div>
         </section>
 
