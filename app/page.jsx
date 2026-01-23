@@ -20,6 +20,7 @@ import GithubCalendarClient from "@/components/gg"
 import {skillsData} from './data'
 import OpenSourceContributionsCard from "@/components/ContributionCard"
 import CheckMyGitPreview from "@/components/CheckMyGitPreview"
+import CalendarModal from "@/components/CalendarModal"
 export default function Page() {
   const { theme, setTheme } = useTheme()
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -311,7 +312,7 @@ export default function Page() {
             <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-zinc-900 dark:text-white">
               GitHub Contributions
             </h2>
-            <CheckMyGitPreview username="hemanth5544" />
+            {/* <CheckMyGitPreview username="hemanth5544" /> */}
           </div>
           <GithubCalendarClient className="" username="hemanth5544" blockSize={13} />
         </section>
@@ -709,6 +710,9 @@ export default function Page() {
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
+
+      {/* Calendar Modal Component */}
+      <CalendarModal />
     </div>
     </ClickSpark>
     
