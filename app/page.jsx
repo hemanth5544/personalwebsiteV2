@@ -12,6 +12,7 @@ import ClickSpark from "@/components/ClickSpark"
 import TimeCounter from "@/components/TimeCounter"
 import CodeHover from "@/components/CodeHover"
 import LinkPreview from "@/components/LinkPreview"
+import CurlBadge from "@/components/CurlBadge"
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect"
 import { RandomMatrix } from "@/components/ui/matrix"
 import githubAvatar from "@/assets/githubhemu.jpeg"
@@ -232,6 +233,10 @@ export default function Page() {
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 -mt-2">
                   been here for <TimeCounter startDate={new Date("2003-06-04")} /> years
                 </p>
+              <div>
+             
+                <CurlBadge command="curl https://hemanthr.xyz" />
+                </div>
           
                 <div className="space-y-2 sm:space-y-3">
                   <h2 className="text-base sm:text-lg md:text-xl font-medium text-zinc-900 dark:text-white">about;</h2>
@@ -625,7 +630,7 @@ export default function Page() {
                 <span className="absolute bottom-0 left-0 w-0 h-px bg-zinc-400 dark:bg-zinc-500 group-hover:w-full transition-all duration-300 ease-out"></span>
               </a>
             </p>
-            
+
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6">
               <LinkPreview
                 title="LinkedIn • Hemanth Rachapalli"
