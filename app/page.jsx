@@ -21,6 +21,7 @@ import {skillsData} from './data'
 import OpenSourceContributionsCard from "@/components/ContributionCard"
 import CheckMyGitPreview from "@/components/CheckMyGitPreview"
 import CalendarModal from "@/components/CalendarModal"
+import StatusBadge from "@/components/StatusBadge"
 export default function Page() {
   const { theme, setTheme } = useTheme()
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -153,44 +154,47 @@ export default function Page() {
         {/* Interactive Ripple Grid Background */}
         <BackgroundRippleEffect rows={20} cols={40} cellSize={50} />
       {/* Header */}
-      <header className="container mx-auto px-4 py-4 sm:py-6 flex justify-center items-center animate-fade-in relative z-50">
-        <Button
-          variant="ghost"
-          size="icon"
-          data-no-letter
-          onClick={handleThemeToggle}
-          disabled={isTransitioning}
-          className={`relative rounded-full w-10 h-10 sm:w-12 sm:h-12 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
-            isTransitioning ? 'opacity-70 cursor-wait' : ''
-          }`}
-          aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Toggle theme"}
-        >
-          {/* Sun Icon - shows in dark mode to switch to light */}
-          <Sun 
-            className={`absolute h-5 w-5 sm:h-6 sm:w-6 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              theme === "dark" 
-                ? 'rotate-0 scale-100 opacity-100' 
-                : 'rotate-[360deg] scale-0 opacity-0'
+      <header className="container mx-auto px-4 py-4 sm:py-6 flex justify-end items-center animate-fade-in relative z-50">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <StatusBadge />
+          <Button
+            variant="ghost"
+            size="icon"
+            data-no-letter
+            onClick={handleThemeToggle}
+            disabled={isTransitioning}
+            className={`relative rounded-full w-10 h-10 sm:w-12 sm:h-12 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              isTransitioning ? 'opacity-70 cursor-wait' : ''
             }`}
-            style={{
-              filter: theme === "dark" ? 'drop-shadow(0 0 4px rgba(251, 191, 36, 0.5))' : 'none',
-              transition: 'all 700ms cubic-bezier(0.4, 0, 0.2, 1), filter 700ms ease-in-out'
-            }}
-          />
-          {/* Moon Icon - shows in light mode to switch to dark */}
-          <Moon 
-            className={`absolute h-5 w-5 sm:h-6 sm:w-6 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-              theme === "dark" 
-                ? 'rotate-[-360deg] scale-0 opacity-0' 
-                : 'rotate-0 scale-100 opacity-100'
-            }`}
-            style={{
-              filter: theme === "dark" ? 'none' : 'drop-shadow(0 0 4px rgba(147, 197, 253, 0.5))',
-              transition: 'all 700ms cubic-bezier(0.4, 0, 0.2, 1), filter 700ms ease-in-out'
-            }}
-          />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+            aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Toggle theme"}
+          >
+            {/* Sun Icon - shows in dark mode to switch to light */}
+            <Sun 
+              className={`absolute h-5 w-5 sm:h-6 sm:w-6 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                theme === "dark" 
+                  ? 'rotate-0 scale-100 opacity-100' 
+                  : 'rotate-[360deg] scale-0 opacity-0'
+              }`}
+              style={{
+                filter: theme === "dark" ? 'drop-shadow(0 0 4px rgba(251, 191, 36, 0.5))' : 'none',
+                transition: 'all 700ms cubic-bezier(0.4, 0, 0.2, 1), filter 700ms ease-in-out'
+              }}
+            />
+            {/* Moon Icon - shows in light mode to switch to dark */}
+            <Moon 
+              className={`absolute h-5 w-5 sm:h-6 sm:w-6 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                theme === "dark" 
+                  ? 'rotate-[-360deg] scale-0 opacity-0' 
+                  : 'rotate-0 scale-100 opacity-100'
+              }`}
+              style={{
+                filter: theme === "dark" ? 'none' : 'drop-shadow(0 0 4px rgba(147, 197, 253, 0.5))',
+                transition: 'all 700ms cubic-bezier(0.4, 0, 0.2, 1), filter 700ms ease-in-out'
+              }}
+            />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+        </div>
       </header>
 
       {/* Main Content */}
