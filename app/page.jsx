@@ -697,7 +697,7 @@ export default function Page() {
             <div className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-zinc-200 dark:border-zinc-700">
               <h3 className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-white truncate flex-1 mr-2">Resume — Hemanth Rachapalli</h3>
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                <a href="/Hemanth.RES.pdf" download target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white text-xs sm:text-sm" data-no-letter>
+                <a href="/Hemanthrdev.pdf" download target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white text-xs sm:text-sm" data-no-letter>
                   <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Download</span>
                 </a>
@@ -707,7 +707,7 @@ export default function Page() {
               </div>
             </div>
             <div className="flex-1 bg-zinc-50 dark:bg-zinc-950 overflow-auto">
-              <iframe src="/Hemanth.RES.pdf#view=FitH" className="w-full h-full min-h-[400px] sm:min-h-[500px]" title="Resume PDF" />
+              <iframe src="/Hemanthrdev.pdf#view=FitH" className="w-full h-full min-h-[400px] sm:min-h-[500px]" title="Resume PDF" />
             </div>
           </div>
         </div>
