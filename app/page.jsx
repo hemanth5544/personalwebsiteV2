@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { motion } from 'framer-motion'
 
 import { useTheme } from "next-themes"
 import { Sun, Moon, Heart, Download, X } from "lucide-react"
@@ -17,6 +18,8 @@ import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect
 import { RandomMatrix } from "@/components/ui/matrix"
 import githubAvatar from "@/assets/githubhemu.jpeg"
 import linkedinAvatar from "@/assets/linkhemu.png"
+import me from "@/assets/devr-removebg-preview.png"
+import Image from "next/image"
 import GithubCalendarClient from "@/components/gg"
 import {skillsData} from './data'
 import OpenSourceContributionsCard from "@/components/ContributionCard"
@@ -291,9 +294,32 @@ export default function Page() {
                 </div>
               </div>
             </div>
-            
+            <motion.main
+              key="human"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              className="flex w-full max-w-2xl flex-col items-center text-center"
+            >
+    <div className="relative mb-2 h-56 w-56 sm:h-72 sm:w-72 overflow-hidden self-end mr-0 sm:mr-[-2rem]">
+      <Image
+        src={me}
+        alt="Profile"
+        fill
+        className="object-contain grayscale"
+        priority
+      />
+      {/* Bottom fade - smoky */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-zinc-50 via-zinc-50/60 dark:from-zinc-900 dark:via-zinc-900/60 to-transparent backdrop-blur-[1px]" />
+      {/* Right fade - smoky */}
+      <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-zinc-50 via-zinc-50/60 dark:from-zinc-900 dark:via-zinc-900/60 to-transparent backdrop-blur-[1px]" />
+    </div>
+            </motion.main>
+                  
+
             {/* Matrix Component - aligned with top of heading */}
-            <div className="hidden lg:flex items-start justify-center self-start flex-shrink-0">
+            {/* <div className="hidden lg:flex items-start justify-center self-start flex-shrink-0">
               <RandomMatrix
                 rows={20}
                 cols={20}
@@ -311,7 +337,7 @@ export default function Page() {
                 ariaLabel="Random matrix patterns"
                 className="rounded-lg border-2 border-zinc-600 dark:border-zinc-500 shadow-xl p-3 lg:p-4 bg-white dark:bg-black"
               />
-            </div>
+            </div> */}
           </div>
         </section>
 
