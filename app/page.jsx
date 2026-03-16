@@ -18,7 +18,7 @@ import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect
 import { RandomMatrix } from "@/components/ui/matrix"
 import githubAvatar from "@/assets/githubhemu.jpeg"
 import linkedinAvatar from "@/assets/linkhemu.png"
-import me from "@/assets/devr-removebg-preview.png"
+import me from "@/assets/profile.png"
 import Image from "next/image"
 import GithubCalendarClient from "@/components/gg"
 import {skillsData} from './data'
