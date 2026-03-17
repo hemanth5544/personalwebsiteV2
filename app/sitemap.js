@@ -1,7 +1,7 @@
 export default function sitemap() {
   return [
     {
-      url: 'https://hemanthrachapalli.up.railway.app/',
+      url: 'https://hemanthr.xyz/',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 1,
