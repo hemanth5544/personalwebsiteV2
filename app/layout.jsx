@@ -1,6 +1,5 @@
 import { ThemeProvider } from "./theme-provider"
 import './globals.css'
-
 export const metadata = {
   title: {
     default: 'Hemanth Rachapalli - SDE & Backend Engineer',
@@ -34,7 +33,23 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-  
+    title: 'Hemanth Rachapalli | SDE & Backend Engineer',
+    description: 'Hemanth Rachapalli is a Software Development Engineer and Backend Engineer specializing in building scalable web applications and services.',
+    url: 'https://hemanthr.xyz/',
+    images: [
+      {
+        url: '/social-preview.png',
+        width: 1200,
+        height: 630,
+        alt: 'Hemanth Rachapalli Portfolio',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hemanth Rachapalli | SDE & Backend Engineer',
+    description: 'Hemanth Rachapalli is a Software Development Engineer and Backend Engineer specializing in building scalable web applications and services.',
+    images: ['/social-preview.png'],
   },
  
   icons: {
