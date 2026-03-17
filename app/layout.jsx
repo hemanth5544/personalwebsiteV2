@@ -1,6 +1,7 @@
 import { ThemeProvider } from "./theme-provider"
 import './globals.css'
 export const metadata = {
+  metadataBase: new URL('https://hemanthr.xyz'),
   title: {
     default: 'Hemanth Rachapalli - SDE & Backend Engineer',
     template: '%s | Hemanth Rachapalli'
@@ -38,7 +39,7 @@ export const metadata = {
     url: 'https://hemanthr.xyz/',
     images: [
       {
-        url: '/social-preview.png',
+        url: 'https://hemanthr.xyz/social-preview.png',
         width: 1200,
         height: 630,
         alt: 'Hemanth Rachapalli Portfolio',
@@ -49,7 +50,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Hemanth Rachapalli | SDE & Backend Engineer',
     description: 'Hemanth Rachapalli is a Software Development Engineer and Backend Engineer specializing in building scalable web applications and services.',
-    images: ['/social-preview.png'],
+    images: ['https://hemanthr.xyz/social-preview.png'],
   },
  
   icons: {
