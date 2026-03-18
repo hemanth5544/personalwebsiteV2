@@ -12,13 +12,15 @@ import {
 
 export function FloatingDockDemo({ github, linkedin, twitter, blog, portfolio, home }) {
   const navigationItems = [
-    { label: "Home",      icon: <IconHome className="h-full w-full text-neutral-500 dark:text-neutral-300" />,      link: home || "#" },
-    { label: "Blog",      icon: <IconPencil className="h-full w-full text-neutral-500 dark:text-neutral-300" />,    link: blog || "#" },
-    // { label: "Portfolio", icon: <IconUserFilled className="h-full w-full text-neutral-500 dark:text-neutral-300" />, link: portfolio || "#" },
-    { label: "LinkedIn",  icon: <IconBrandLinkedin className="h-full w-full text-neutral-500 dark:text-neutral-300" />, link: linkedin || "#" },
-    { label: "Twitter",   icon: <IconBrandX className="h-full w-full text-neutral-500 dark:text-neutral-300" />,    link: twitter || "#" },
-    { label: "GitHub",    icon: <IconBrandGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />, link: github || "#" },
+    { label: "Home",      icon: <IconHome className="h-full w-full text-neutral-500 dark:text-neutral-300" />,      link: home || "#",  newTab: false },
+    { label: "Blog",      icon: <IconPencil className="h-full w-full text-neutral-500 dark:text-neutral-300" />,    link: blog || "#",  newTab: false },
+    // { label: "Portfolio", icon: <IconUserFilled className="h-full w-full text-neutral-500 dark:text-neutral-300" />, link: portfolio || "#",  newTab: false },
+    { label: "LinkedIn",  icon: <IconBrandLinkedin className="h-full w-full text-neutral-500 dark:text-neutral-300" />, link: linkedin || "#",  newTab: true },
+    { label: "Twitter",   icon: <IconBrandX className="h-full w-full text-neutral-500 dark:text-neutral-300" />,    link: twitter || "#",  newTab: true },
+    { label: "GitHub",    icon: <IconBrandGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />, link: github || "#",  newTab: true },
   ];
+
+
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999]">

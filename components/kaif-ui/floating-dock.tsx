@@ -20,8 +20,7 @@ export const FloatingDock = ({
   desktopClassName,
   mobileClassName,
 }: {
-  navigationItems: { label: string; icon: React.ReactNode; link: string }[];
-  desktopClassName?: string;
+navigationItems: { label: string; icon: React.ReactNode; link: string; newTab?: boolean }[];  desktopClassName?: string;
   mobileClassName?: string;
 }) => {
   return (
@@ -118,11 +117,14 @@ function IconContainer({
   label,
   icon,
   link,
+  newTab
 }: {
   mouseX: MotionValue;
   label: string;
   icon: React.ReactNode;
   link: string;
+  newTab?: boolean;
+
 }) {
   let ref = useRef<HTMLDivElement>(null);
  
@@ -167,8 +169,7 @@ function IconContainer({
   const [hovered, setHovered] = useState(false);
  
  return (
-  <Link href={link} target="_blank" rel="noopener noreferrer">
-    <motion.div
+<Link href={link} {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}>    <motion.div
       ref={ref}
       style={{ width, height }}
       onMouseEnter={() => setHovered(true)}
