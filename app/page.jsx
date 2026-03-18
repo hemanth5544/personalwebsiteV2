@@ -25,7 +25,7 @@ import {skillsData} from './data'
 import OpenSourceContributionsCard from "@/components/ContributionCard"
 import CheckMyGitPreview from "@/components/CheckMyGitPreview"
 import CalendarModal from "@/components/CalendarModal"
-import StatusBadge from "@/components/StatusBadge"
+import Pill from "@/components/StatusBadge"
 export default function Page() {
   const { theme, setTheme } = useTheme()
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -159,15 +159,15 @@ export default function Page() {
         <BackgroundRippleEffect rows={20} cols={40} cellSize={50} />
       {/* Header */}
       <header className="container mx-auto px-4 py-4 sm:py-6 flex justify-end items-center animate-fade-in relative z-50">
+          <Pill />
         <div className="flex items-center gap-2 sm:gap-3">
-          <StatusBadge />
           <Button
             variant="ghost"
             size="icon"
             data-no-letter
             onClick={handleThemeToggle}
             disabled={isTransitioning}
-            className={`relative rounded-full w-10 h-10 sm:w-12 sm:h-12 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+            className={`relative rounded-full w-8 h-8 sm:w-12 sm:h-12 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
               isTransitioning ? 'opacity-70 cursor-wait' : ''
             }`}
             aria-label={mounted ? `Switch to ${theme === "dark" ? "light" : "dark"} mode` : "Toggle theme"}
