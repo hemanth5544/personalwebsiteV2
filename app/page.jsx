@@ -21,10 +21,11 @@ import Image from "next/image"
 import GithubCalendarClient from "@/components/gg"
 import {skillsData} from './data'
 import OpenSourceContributionsCard from "@/components/ContributionCard"
-import CheckMyGitPreview from "@/components/CheckMyGitPreview"
 import CalendarModal from "@/components/CalendarModal"
 import Pill from "@/components/StatusBadge"
 import ThemeToggle from "@/components/theme"
+import FloatingDockDemo from "@/components/Dock";
+
 export default function Page() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [showResume, setShowResume] = useState(false)
@@ -143,7 +144,16 @@ export default function Page() {
             <Pill />
             <ThemeToggle />
           </div>
+
         </header>
+        <FloatingDockDemo
+          github="https://github.com/hemanth5544"
+          linkedin="https://in.linkedin.com/in/hemanthrachapalli"
+          twitter="https://x.com/hemanthrdev"
+          home="#home"
+          blog="#blog"
+          portfolio="#projects"
+        />      
 
       {/* Main Content */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12 space-y-12 sm:space-y-16 md:space-y-20 lg:space-y-24 max-w-7xl relative z-50" role="main">
