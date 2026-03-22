@@ -9,11 +9,14 @@ import {
   Play,
   SkipBack,
   SkipForward,
+  Send,
   Thermometer,
   Timer as TimerIcon,
 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
+
+type VoiceButtonState = "idle" | "recording" | "processing" | "success" | "error";
 
 const BOUNCE_VARIANTS = {
   idle: 0.5,
@@ -68,16 +71,204 @@ const DefaultIdle = () => {
   );
 };
 
-const DefaultRing = () => (
-  <div className="flex w-64 items-center gap-3 px-4 py-3">
-    <Phone className="h-5 w-5 shrink-0" style={{ color: "#4ade80" }} />
-    <div className="flex-1">
-      <p className="font-medium text-sm text-white">Leave a message</p>
-      <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>Hemanth R</p>
+// Voice Recorder Ring View
+const VoiceRing = () => {
+  const [voiceState, setVoiceState] = useState<VoiceButtonState>("idle");
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const formatDuration = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  const handlePress = async () => {
+    if (voiceState === "idle" || voiceState === "success") {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streamRef.current = stream;
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+        const chunks: Blob[] = [];
+
+        // Start duration timer
+        setDuration(0);
+        timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
+
+        mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          if (timerRef.current) clearInterval(timerRef.current);
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          setAudioBlob(blob);
+          setVoiceState("processing");
+          setTimeout(() => setVoiceState("success"), 800);
+        };
+
+        mediaRecorder.start();
+        setVoiceState("recording");
+        setAudioBlob(null);
+        setSent(false);
+        setFailed(false);
+      } catch {
+        setVoiceState("error");
+      }
+    } else if (voiceState === "recording") {
+      mediaRecorderRef.current?.stop();
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    }
+  };
+
+  const handleSend = async () => {
+    if (!audioBlob) return;
+    setSending(true);
+    setFailed(false);
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "voice-note.webm");
+    try {
+      const res = await fetch("/api/send-voice", { method: "POST", body: formData });
+      if (res.ok) {
+        setSent(true);
+        setAudioBlob(null);
+        setVoiceState("idle");
+        setDuration(0);
+        setTimeout(() => setSent(false), 3000);
+      } else {
+        setFailed(true);
+        setVoiceState("error");
+        setTimeout(() => { setFailed(false); setVoiceState("idle"); }, 3000);
+      }
+    } catch {
+      setFailed(true);
+      setVoiceState("error");
+      setTimeout(() => { setFailed(false); setVoiceState("idle"); }, 3000);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleDiscard = () => {
+    setAudioBlob(null);
+    setVoiceState("idle");
+    setDuration(0);
+    setSent(false);
+    setFailed(false);
+  };
+
+  const isRecording = voiceState === "recording";
+  const isProcessing = voiceState === "processing";
+  const isReady = voiceState === "success" && !!audioBlob;
+  const isError = voiceState === "error";
+
+  return (
+    <div className="flex items-center gap-2.5 px-4 py-3" style={{ width: "300px" }}>
+      {/* Phone icon — pulses green when recording */}
+      <Phone
+        className="h-5 w-5 shrink-0 transition-all"
+        style={{
+          color: isRecording ? "#4ade80" : isError || failed ? "#f87171" : "#4ade80",
+          filter: isRecording ? "drop-shadow(0 0 4px #4ade80)" : "none",
+        }}
+      />
+
+      {/* Text area */}
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-sm text-white leading-tight">
+          {sent && "Sent!"}
+          {failed && "Failed to send"}
+          {isRecording && "Recording..."}
+          {isProcessing && "Processing..."}
+          {isReady && "Ready to send"}
+          {voiceState === "idle" && !sent && !failed && "Voice Message"}
+          {isError && !failed && "Mic error"}
+        </p>
+        <p className="text-xs leading-tight" style={{ color: "rgba(255,255,255,0.5)" }}>
+          {isRecording && formatDuration(duration)}
+          {isProcessing && "Preparing audio..."}
+          {isReady && `${formatDuration(duration)} recorded`}
+          {voiceState === "idle" && !sent && !failed && "Tap mic to record"}
+          {sent && "Email delivered via Resend"}
+          {failed && "Tap mic to try again"}
+          {isError && !failed && "Check mic permissions"}
+        </p>
+      </div>
+
+      {/* Discard button — only when ready */}
+      <AnimatePresence>
+        {isReady && (
+          <motion.button
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            onClick={handleDiscard}
+            type="button"
+            className="flex shrink-0 items-center justify-center transition-colors"
+            style={{ width: 28, height: 28, borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}
+          >
+            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Mic / stop / spinner button */}
+      <button
+        onClick={handlePress}
+        disabled={isProcessing || sending}
+        type="button"
+        className="flex shrink-0 items-center justify-center transition-all"
+        style={{
+          width: 32, height: 32, borderRadius: "50%",
+          backgroundColor: isRecording ? "#ef4444" : isError ? "rgba(248,113,113,0.2)" : "rgba(255,255,255,0.15)",
+          color: "#ffffff",
+          boxShadow: isRecording ? "0 0 0 3px rgba(239,68,68,0.25)" : "none",
+        }}
+      >
+        {isProcessing || sending ? (
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          </svg>
+        ) : isRecording ? (
+          <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="5" y="5" width="14" height="14" rx="2" />
+          </svg>
+        ) : (
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+            <rect x="9" y="2" width="6" height="11" rx="3" />
+            <path d="M5 10a7 7 0 0 0 14 0" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+            <line x1="9" y1="22" x2="15" y2="22" />
+          </svg>
+        )}
+      </button>
+
+      {/* Send button */}
+      <AnimatePresence>
+        {isReady && (
+          <motion.button
+            animate={{ opacity: 1, scale: 1, width: 32 }}
+            exit={{ opacity: 0, scale: 0.8, width: 0 }}
+            initial={{ opacity: 0, scale: 0.8, width: 0 }}
+            onClick={handleSend}
+            disabled={sending}
+            type="button"
+            className="flex h-8 shrink-0 items-center justify-center transition-colors overflow-hidden"
+            style={{ borderRadius: "50%", backgroundColor: "#4ade80", color: "#000" }}
+          >
+            <Send className="h-3.5 w-3.5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
-    <div className="h-2 w-2 shrink-0 animate-pulse rounded-full" style={{ backgroundColor: "#4ade80" }} />
-  </div>
-);
+  );
+};
 
 const DefaultTimer = () => {
   const [time, setTime] = useState(60);
@@ -130,37 +321,22 @@ const MusicPlayer = () => {
   const [playing, setPlaying] = useState(true);
   return (
     <div className="flex w-72 items-center gap-2 px-4 py-3">
-      <Music2 className="h-5 w-5 shrink-0" style={{ color: "#eb8d21" }} />
+      <Music2 className="h-5 w-5 shrink-0" style={{ color: "#f472b6" }} />
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-sm text-white">Brats</p>
         <p className="truncate text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>Arjan Dhillon</p>
       </div>
-      <button
-        className="rounded-full p-1 hover:bg-white/20"
-        style={{ color: "#ffffff" }}
-        onClick={() => setPlaying(false)}
-        type="button"
-      >
+      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => setPlaying(false)} type="button">
         <SkipBack className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
       </button>
-      <button
-        className="rounded-full p-1 hover:bg-white/20"
-        style={{ color: "#ffffff" }}
-        onClick={() => setPlaying((p) => !p)}
-        type="button"
-      >
+      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => setPlaying((p) => !p)} type="button">
         {playing ? (
           <Pause className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
         ) : (
           <Play className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
         )}
       </button>
-      <button
-        className="rounded-full p-1 hover:bg-white/20"
-        style={{ color: "#ffffff" }}
-        onClick={() => setPlaying(true)}
-        type="button"
-      >
+      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => setPlaying(true)} type="button">
         <SkipForward className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
       </button>
     </div>
@@ -188,7 +364,7 @@ export default function DynamicIsland({
 }: DynamicIslandProps) {
   const [internalView, setInternalView] = useState<View>("idle");
   const [variantKey, setVariantKey] = useState<string>("idle");
-  const [expanded, setExpanded] = useState(false); // collapsed by default
+  const [expanded, setExpanded] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
   const view = controlledView ?? internalView;
@@ -196,7 +372,7 @@ export default function DynamicIsland({
   const content = useMemo(() => {
     switch (view) {
       case "ring":
-        return ringContent ?? <DefaultRing />;
+        return ringContent ?? <VoiceRing />;
       case "timer":
         return timerContent ?? <DefaultTimer />;
       case "notification":
@@ -209,7 +385,7 @@ export default function DynamicIsland({
   }, [view, idleContent, ringContent, timerContent]);
 
   const handleViewChange = (newView: View) => {
-    setExpanded(true); // always expand when switching view
+    setExpanded(true);
     if (view === newView) return;
     setVariantKey(`${view}-${newView}`);
     if (onViewChange) {
@@ -240,7 +416,6 @@ export default function DynamicIsland({
         }
       >
         <div className="overflow-hidden rounded-full">
-          {/* Collapsed: clickable dot */}
           {!expanded && (
             <button
               type="button"
@@ -250,7 +425,6 @@ export default function DynamicIsland({
             />
           )}
 
-          {/* Expanded: content with close on pill click, but not on inner button clicks */}
           {expanded && (
             <motion.div
               animate={
@@ -291,7 +465,7 @@ export default function DynamicIsland({
         {[
           { key: "idle", icon: <CloudLightning className="size-3 text-foreground" /> },
           { key: "ring", icon: <Phone className="size-3 text-foreground" /> },
-          { key: "timer", icon: <TimerIcon className="size-3 text-foreground" /> },
+          // { key: "timer", icon: <TimerIcon className="size-3 text-foreground" /> },
           { key: "notification", icon: <Bell className="size-3 text-foreground" /> },
           { key: "music", icon: <Music2 className="size-3 text-foreground" /> },
         ].map(({ key, icon }) => (
