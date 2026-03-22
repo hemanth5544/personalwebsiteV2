@@ -138,16 +138,19 @@ export default function Page() {
     >
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white relative transition-colors duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]">
         {/* Interactive Ripple Grid Background */}
-        <Di/>
+        {/* <Di/> */}
         <BackgroundRippleEffect rows={20} cols={40} cellSize={50} />
       {/* Header */}
-        <header className="container mx-auto px-4 py-4 sm:py-6 flex justify-end items-center animate-fade-in relative z-50">
-          <div className="flex items-center gap-4 sm:gap-6 mr-16">
-            <Pill />
-            <ThemeToggle />
-          </div>
-
-        </header>
+<header className="container mx-auto px-4 py-4 flex items-center relative z-50">
+  <div className="flex-1" />
+  <div className="flex-1 flex justify-center -translate-y-4">
+  <Di />
+</div>
+  <div className="flex-1 flex justify-end items-center gap-4 pr-40">
+    <Pill />
+    <ThemeToggle />
+  </div>
+</header>
         <FloatingDockDemo
           github="https://github.com/hemanth5544"
           linkedin="https://in.linkedin.com/in/hemanthrachapalli"

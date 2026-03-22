@@ -72,8 +72,8 @@ const DefaultRing = () => (
   <div className="flex w-64 items-center gap-3 px-4 py-3">
     <Phone className="h-5 w-5 shrink-0" style={{ color: "#4ade80" }} />
     <div className="flex-1">
-      <p className="font-medium text-sm text-white">Incoming Call</p>
-      <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>Guillermo Rauch</p>
+      <p className="font-medium text-sm text-white">Leave a message</p>
+      <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>Hemanth R</p>
     </div>
     <div className="h-2 w-2 shrink-0 animate-pulse rounded-full" style={{ backgroundColor: "#4ade80" }} />
   </div>
@@ -130,10 +130,10 @@ const MusicPlayer = () => {
   const [playing, setPlaying] = useState(true);
   return (
     <div className="flex w-72 items-center gap-2 px-4 py-3">
-      <Music2 className="h-5 w-5 shrink-0" style={{ color: "#f472b6" }} />
+      <Music2 className="h-5 w-5 shrink-0" style={{ color: "#eb8d21" }} />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-sm text-white">Lofi Chill Beats</p>
-        <p className="truncate text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>DJ Smooth</p>
+        <p className="truncate font-medium text-sm text-white">Brats</p>
+        <p className="truncate text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>Arjan Dhillon</p>
       </div>
       <button
         className="rounded-full p-1 hover:bg-white/20"
