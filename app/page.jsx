@@ -25,6 +25,7 @@ import CalendarModal from "@/components/CalendarModal"
 import Pill from "@/components/StatusBadge"
 import ThemeToggle from "@/components/theme"
 import FloatingDockDemo from "@/components/Dock";
+import Di from "@/components/dynamic"
 
 export default function Page() {
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -137,6 +138,7 @@ export default function Page() {
     >
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white relative transition-colors duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]">
         {/* Interactive Ripple Grid Background */}
+        <Di/>
         <BackgroundRippleEffect rows={20} cols={40} cellSize={50} />
       {/* Header */}
         <header className="container mx-auto px-4 py-4 sm:py-6 flex justify-end items-center animate-fade-in relative z-50">
