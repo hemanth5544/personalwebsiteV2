@@ -14,7 +14,7 @@ import {
   Timer as TimerIcon,
 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { type ReactNode, useMemo, useRef, useState } from "react";
+import { type ReactNode, useMemo, useRef, useState ,useEffect} from "react";
 
 type VoiceButtonState = "idle" | "recording" | "processing" | "success" | "error";
 
@@ -318,7 +318,30 @@ const Notification = () => (
 );
 
 const MusicPlayer = () => {
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio("/brats.mp3");
+    audioRef.current = audio;
+    audio.addEventListener("ended", () => setPlaying(false));
+    return () => {
+      audio.pause();
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+      setPlaying(false);
+    } else {
+      audio.play();
+      setPlaying(true);
+    }
+  };
+
   return (
     <div className="flex w-72 items-center gap-2 px-4 py-3">
       <Music2 className="h-5 w-5 shrink-0" style={{ color: "#f472b6" }} />
@@ -326,17 +349,17 @@ const MusicPlayer = () => {
         <p className="truncate font-medium text-sm text-white">Brats</p>
         <p className="truncate text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>Arjan Dhillon</p>
       </div>
-      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => setPlaying(false)} type="button">
+      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => { if(audioRef.current) audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10); }} type="button">
         <SkipBack className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
       </button>
-      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => setPlaying((p) => !p)} type="button">
+      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={togglePlay} type="button">
         {playing ? (
           <Pause className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
         ) : (
           <Play className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
         )}
       </button>
-      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => setPlaying(true)} type="button">
+      <button className="rounded-full p-1 hover:bg-white/20" style={{ color: "#ffffff" }} onClick={() => { if(audioRef.current) audioRef.current.currentTime = Math.min(audioRef.current.duration, audioRef.current.currentTime + 10); }} type="button">
         <SkipForward className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} />
       </button>
     </div>
