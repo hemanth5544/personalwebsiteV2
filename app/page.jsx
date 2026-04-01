@@ -26,11 +26,11 @@ import Pill from "@/components/StatusBadge"
 import ThemeToggle from "@/components/theme"
 import FloatingDockDemo from "@/components/Dock";
 import Di from "@/components/dynamic"
+import ProjectsSection from "@/components/section/projects-section"
 
 export default function Page() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [showResume, setShowResume] = useState(false)
-  const [hoveredProject, setHoveredProject] = useState(null)
 
   const triggerRandomLetterEffect = () => {
     if (typeof document === 'undefined') return
@@ -325,280 +325,203 @@ export default function Page() {
         </section>
 
 
-        {/* Technical Skills Section */}
-        <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-center text-zinc-900 dark:text-white">
-            Technical Space
-         </h2>
-          
-          {/* Programming Languages */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 auto-rows-fr items-stretch">
-            <div className="p-3 sm:p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 h-full flex flex-col gap-3 sm:gap-4">
-              <h3 className="text-base sm:text-lg font-medium text-zinc-900 dark:text-white">Programming Languages</h3>
-                <div className="flex flex-wrap gap-2 items-start w-full">
-                  {skillsData.languages.map((skill) => {
-                    const chip = (
-                      <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
-                        <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-4 h-4 sm:w-5 sm:h-5" loading="lazy" />
-                        <span className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-white">{skill.name}</span>
-                      </div>
-                    )
-                    if (skill.name === 'C') {
-                      return (
-                        <CodeHover key={skill.name} lang="c">
-                          {chip}
-                        </CodeHover>
+        <div className="mx-auto w-full max-w-7xl space-y-4 sm:space-y-6">
+          {/* Technical Skills Section */}
+          <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <h2 className="text-lg sm:text-xl font-medium text-center text-zinc-900 dark:text-white">
+              Technical Space
+           </h2>
+            
+            {/* Programming Languages */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+              <div className="p-2 sm:p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 flex flex-col gap-2">
+                <h3 className="text-sm font-medium text-zinc-900 dark:text-white">Programming Languages</h3>
+                  <div className="flex flex-wrap gap-2 items-start w-full">
+                    {skillsData.languages.map((skill) => {
+                      const chip = (
+                        <div className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
+                          <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-3.5 h-3.5" loading="lazy" />
+                          <span className="text-xs font-medium text-zinc-900 dark:text-white">{skill.name}</span>
+                        </div>
                       )
-                    }
-                    const map = {
-                      'C++': 'cpp',
-                      'Java': 'java',
-                      'Python': 'python',
-                      'JavaScript': 'javascript',
-                      'TypeScript': 'typescript',
-                      'Rust': 'rust',
-                      'Go': 'go',
-                    }
-                    const langKey = map[skill.name]
-                    if (langKey) {
+                      if (skill.name === 'C') {
+                        return (
+                          <CodeHover key={skill.name} lang="c">
+                            {chip}
+                          </CodeHover>
+                        )
+                      }
+                      const map = {
+                        'C++': 'cpp',
+                        'Java': 'java',
+                        'Python': 'python',
+                        'JavaScript': 'javascript',
+                        'TypeScript': 'typescript',
+                        'Rust': 'rust',
+                        'Go': 'go',
+                      }
+                      const langKey = map[skill.name]
+                      if (langKey) {
+                        return (
+                          <CodeHover key={skill.name} lang={langKey}>
+                            {chip}
+                          </CodeHover>
+                        )
+                      }
                       return (
-                        <CodeHover key={skill.name} lang={langKey}>
+                        <div key={skill.name}>
                           {chip}
-                        </CodeHover>
+                        </div>
                       )
-                    }
-                    return (
-                      <div key={skill.name}>
-                        {chip}
-                      </div>
-                    )
-                  })}
-                </div>
-            </div>
-
-        
-
-            <div className="p-3 sm:p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 h-full flex flex-col gap-3 sm:gap-4">
-              <h3 className="text-base sm:text-lg font-medium text-zinc-900 dark:text-white">Backend & Databases</h3>
-                <div className="flex flex-wrap gap-2 items-start">
-                  {skillsData.backend.map((skill) => {
-                    const chip = (
-                      <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
-                        <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-4 h-4 sm:w-5 sm:h-5" loading="lazy" />
-                        <span className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-white">{skill.name}</span>
-                      </div>
-                    )
-                    const map = {
-                      'Node.js': 'node',
-                      'Express.js': 'express',
-                      'MongoDB': 'mongodb',
-                      'MySQL': 'mysql',
-                      'PostgreSQL': 'postgresql',
-                      'GraphQL': 'graphql',
-                      'NestJs': 'nestjs',
-                      'Sequelize': 'sequelize', 
-                      'Socket': 'socket',                    
-                      // 'Supabase': 'supabase', 
-                    }
-                    const langKey = map[skill.name]
-                    if (langKey) {
-                      return (
-                        <CodeHover key={skill.name} lang={langKey}>
-                          {chip}
-                        </CodeHover>
-                      )
-                    }
-                    return (
-                      <div key={skill.name}>{chip}</div>
-                    )
-                  })}
-                </div>
-            </div>
-
-            <div className="p-3 sm:p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 h-full flex flex-col gap-3 sm:gap-4">
-              <h3 className="text-base sm:text-lg font-medium text-zinc-900 dark:text-white"> Jobs & Libraries</h3>
-                <div className="flex flex-wrap gap-2 items-start">
-                  {skillsData.libraries.map((skill) => {
-                    const chip = (
-                      <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
-                        <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-4 h-4 sm:w-5 sm:h-5" loading="lazy" />
-                        <span className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-white">{skill.name}</span>
-                      </div>
-                    )
-                    const map = {
-                      'Jest': 'jest',
-                      'Elasticsearch': 'elasticsearch',
-                      'Redis': 'redis',
-                      'Kafka': 'kafka',
-                      'Deno': 'deno',
-                      'Bun': 'bun',
-                      'Electron': 'electron',
-                      
-                    }
-                    const langKey = map[skill.name]
-                    if (langKey) {
-                      return (
-                        <CodeHover key={skill.name} lang={langKey}>
-                          {chip}
-                        </CodeHover>
-                      )
-                    }
-                    return (
-                      <div key={skill.name}>{chip}</div>
-                    )
-                  })}
-                </div>
-            </div>
-
-            <div className="p-3 sm:p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 h-full flex flex-col gap-3 sm:gap-4">
-              <h3 className="text-base sm:text-lg font-medium text-zinc-900 dark:text-white">DevOps & Tools</h3>
-                <div className="flex flex-wrap gap-2 items-start">
-                  {skillsData.tools.map((skill) => {
-                    const chip = (
-                      <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
-                        <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-4 h-4 sm:w-5 sm:h-5" loading="lazy" />
-                        <span className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-white">{skill.name}</span>
-                      </div>
-                    )
-                    const map = {
-                      'Linux': 'linux',
-                      'Git': 'git',
-                      'VS Code': 'vscode',
-                      'Docker': 'docker',
-                      'Firebase': 'firebase',
-                      'AWS': 'aws',
-                      'Vercel': 'vercel',
-                      'Apple': 'apple',
-                    }
-                    const langKey = map[skill.name]
-                    if (langKey) {
-                      return (
-                        <CodeHover key={skill.name} lang={langKey}>
-                          {chip}
-                        </CodeHover>
-                      )
-                    }
-                    return (
-                      <div key={skill.name}>{chip}</div>
-                    )
-                  })}
-                </div>
-            </div>
-
-            <div className="p-3 sm:p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 h-full flex flex-col gap-3 sm:gap-4">
-              <h3 className="text-base sm:text-lg font-medium text-zinc-900 dark:text-white">Monitring & Tools</h3>
-                <div className="flex flex-wrap gap-2 items-start">
-                  {[...skillsData?.hardware].map((skill) => {
-                    const chip = (
-                      <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
-                        <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-4 h-4 sm:w-5 sm:h-5" loading="lazy" />
-                        <span className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-white">{skill.name}</span>
-                      </div>
-                    )
-                    const map = {
-                      'Arduino': 'arduino',
-                      'IoT Programming': 'iot',
-                      'Discord Bot Dev': 'discord',
-                      'Discord.js': 'discordjs',
-                      'Discord.py': 'discordpy',
-                    }
-                    const langKey = map[skill.name]
-                    if (langKey) {
-                      return (
-                        <CodeHover key={skill.name} lang={langKey}>
-                          {chip}
-                        </CodeHover>
-                      )
-                    }
-                    return (
-                      <div key={skill.name}>{chip}</div>
-                    )
-                  })}
-                </div>
-            </div>
-
-          </div>
-        </section>
-        {/* Projects Section */}
-        <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-        <h2 className="text-xl sm:text-2xl md:text-3xl text-center font-medium text-zinc-900 dark:text-white">
-          Projects
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-auto">
-          {[
-            {
-              title: "QuickSync",
-              description:
-                "Quick Sync is a web‑based app for quickly sharing links, text snippets, and files Open the site on one device, scan the QR code with another, and you instantly get a private, end‑to‑end‑encrypted WebRTC tunnel with no installs, no sign‑ups, and no middleman servers ferrying your data"            ,
-              size: "large",
-              github: "https://github.com/hemanth5544/quicksync"
-            },
-            {
-              title: "Order Execution Engine with retry logic and job mechanism",
-              description:
-                "A high-performance order execution engine with DEX routing and real-time WebSocket status updates. Built for processing market, limit, and sniper orders on Solana DEXs (Raydium and Meteora).",
-              size: "medium",
-              github: "https://github.com/hemanth5544/order-execution-engine"
-            },
-            {
-              title: "Production-ready Boilerplate",
-              description:
-                "A production-ready TypeScript/Express API server with PostgreSQL database integration, type-safe API contracts, and automated OpenAPI documentation generation.",
-              size: "medium",
-              github: "https://github.com/hemanth5544/boiler-plate"
-            },
-            {
-              title: "Nalanda Library Management System",
-              description:
-                "A comprehensive backend system for a library management application with RESTful and GraphQL APIs, built with Node.js, Express, and MongoDB.",
-              size: "medium",
-              github: "https://github.com/hemanth5544/nalanda"
-            },
-            {
-              title: "MediaSync",
-              description:
-                "Go live in a click. Stream, connect, and share instantly using WebRTC and Node.js.",
-              size: "medium",
-              github: "https://github.com/hemanth5544/mediasync"
-            },
-            {
-              title: "InkSync",
-              description:
-                "Real-time collaborative editor built with React & MongoDB.",
-              size: "medium",
-              github: "https://github.com/hemanth5544/inksync"
-            }
-          ].map((project, index) => (
-            <div
-              key={project.title}
-              onClick={() => typeof window !== 'undefined' && window.open(project.github, "_blank")}
-              onMouseEnter={() => setHoveredProject(index)}
-              onMouseLeave={() => setHoveredProject(null)}
-              className={`relative p-4 sm:p-6 rounded-xl bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-700 transition-all duration-300 cursor-pointer ${
-                project.size === "large"
-                  ? "md:col-span-2 lg:col-span-2"
-                  : project.size === "medium"
-                  ? "md:col-span-2 lg:col-span-1"
-                  : ""
-              } ${
-                hoveredProject !== null && hoveredProject !== index
-                  ? "blur-sm scale-[0.98] opacity-60"
-                  : "shadow-lg"
-              }`}
-            >
-              <div className="flex flex-col h-full gap-2 sm:gap-3">
-                <h3 className="text-base sm:text-lg font-medium text-zinc-900 dark:text-white">
-                  {project.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed flex-1">
-                  {project.description}
-                </p>
+                    })}
+                  </div>
               </div>
-            </div>
-          ))}
-        </div>
 
-        </section>
+              <div className="p-2 sm:p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 flex flex-col gap-2">
+                <h3 className="text-sm font-medium text-zinc-900 dark:text-white">Backend & Databases</h3>
+                  <div className="flex flex-wrap gap-2 items-start">
+                    {skillsData.backend.map((skill) => {
+                      const chip = (
+                        <div className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
+                          <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-3.5 h-3.5" loading="lazy" />
+                          <span className="text-xs font-medium text-zinc-900 dark:text-white">{skill.name}</span>
+                        </div>
+                      )
+                      const map = {
+                        'Node.js': 'node',
+                        'Express.js': 'express',
+                        'MongoDB': 'mongodb',
+                        'MySQL': 'mysql',
+                        'PostgreSQL': 'postgresql',
+                        'GraphQL': 'graphql',
+                        'NestJs': 'nestjs',
+                        'Sequelize': 'sequelize', 
+                        'Socket': 'socket',                    
+                        // 'Supabase': 'supabase', 
+                      }
+                      const langKey = map[skill.name]
+                      if (langKey) {
+                        return (
+                          <CodeHover key={skill.name} lang={langKey}>
+                            {chip}
+                          </CodeHover>
+                        )
+                      }
+                      return (
+                        <div key={skill.name}>{chip}</div>
+                      )
+                    })}
+                  </div>
+              </div>
+
+              <div className="p-2 sm:p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 flex flex-col gap-2">
+                <h3 className="text-sm font-medium text-zinc-900 dark:text-white"> Jobs & Libraries</h3>
+                  <div className="flex flex-wrap gap-2 items-start">
+                    {skillsData.libraries.map((skill) => {
+                      const chip = (
+                        <div className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
+                          <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-3.5 h-3.5" loading="lazy" />
+                          <span className="text-xs font-medium text-zinc-900 dark:text-white">{skill.name}</span>
+                        </div>
+                      )
+                      const map = {
+                        'Jest': 'jest',
+                        'Elasticsearch': 'elasticsearch',
+                        'Redis': 'redis',
+                        'Kafka': 'kafka',
+                        'Deno': 'deno',
+                        'Bun': 'bun',
+                        'Electron': 'electron',
+                        
+                      }
+                      const langKey = map[skill.name]
+                      if (langKey) {
+                        return (
+                          <CodeHover key={skill.name} lang={langKey}>
+                            {chip}
+                          </CodeHover>
+                        )
+                      }
+                      return (
+                        <div key={skill.name}>{chip}</div>
+                      )
+                    })}
+                  </div>
+              </div>
+
+              <div className="p-2 sm:p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 flex flex-col gap-2">
+                <h3 className="text-sm font-medium text-zinc-900 dark:text-white">DevOps & Tools</h3>
+                  <div className="flex flex-wrap gap-2 items-start">
+                    {skillsData.tools.map((skill) => {
+                      const chip = (
+                        <div className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
+                          <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-3.5 h-3.5" loading="lazy" />
+                          <span className="text-xs font-medium text-zinc-900 dark:text-white">{skill.name}</span>
+                        </div>
+                      )
+                      const map = {
+                        'Linux': 'linux',
+                        'Git': 'git',
+                        'VS Code': 'vscode',
+                        'Docker': 'docker',
+                        'Firebase': 'firebase',
+                        'AWS': 'aws',
+                        'Vercel': 'vercel',
+                        'Apple': 'apple',
+                      }
+                      const langKey = map[skill.name]
+                      if (langKey) {
+                        return (
+                          <CodeHover key={skill.name} lang={langKey}>
+                            {chip}
+                          </CodeHover>
+                        )
+                      }
+                      return (
+                        <div key={skill.name}>{chip}</div>
+                      )
+                    })}
+                  </div>
+              </div>
+
+              <div className="p-2 sm:p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 flex flex-col gap-2">
+                <h3 className="text-sm font-medium text-zinc-900 dark:text-white">Monitring & Tools</h3>
+                  <div className="flex flex-wrap gap-2 items-start">
+                    {[...skillsData?.hardware].map((skill) => {
+                      const chip = (
+                        <div className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-300">
+                          <img src={skill.iconSrc || skill.iconUrl} alt="" aria-hidden className="w-3.5 h-3.5" loading="lazy" />
+                          <span className="text-xs font-medium text-zinc-900 dark:text-white">{skill.name}</span>
+                        </div>
+                      )
+                      const map = {
+                        'Arduino': 'arduino',
+                        'IoT Programming': 'iot',
+                        'Discord Bot Dev': 'discord',
+                        'Discord.js': 'discordjs',
+                        'Discord.py': 'discordpy',
+                      }
+                      const langKey = map[skill.name]
+                      if (langKey) {
+                        return (
+                          <CodeHover key={skill.name} lang={langKey}>
+                            {chip}
+                          </CodeHover>
+                        )
+                      }
+                      return (
+                        <div key={skill.name}>{chip}</div>
+                      )
+                    })}
+                  </div>
+              </div>
+
+            </div>
+          </section>
+          <section className="space-y-2 sm:space-y-3 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <ProjectsSection />
+          </section>
+        </div>
         
         <section className="space-y-8 sm:space-y-12 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-medium text-zinc-900 dark:text-white">
