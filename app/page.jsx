@@ -156,7 +156,7 @@ export default function Page() {
           linkedin="https://in.linkedin.com/in/hemanthrachapalli"
           twitter="https://x.com/hemanthrdev"
           home="#home"
-          blog="#blog"
+          blog="/blog"
           portfolio="#projects"
         />      
 
