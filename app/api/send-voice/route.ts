@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import dotenv from 'dotenv'
 dotenv.config();
-const resend = new Resend(process.env.RESEND_KEY);
+const resend = new Resend("notneeded");
 
 export async function POST(request: NextRequest) {
   try {
