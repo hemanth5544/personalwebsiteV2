@@ -26,7 +26,7 @@ export default function BlogIndexPage() {
       <main className="container mx-auto max-w-3xl px-4 py-12">
         <h1 className="mb-2 text-3xl font-semibold tracking-tight">Blog</h1>
         <p className="mb-10 text-zinc-600 dark:text-zinc-400">
-          Write-ups on systems I build — starting with seat booking and database locking.
+          Write-ups on systems I build or interests me
         </p>
         <ul className="space-y-8">
           {posts.map((post) => (

@@ -1,77 +1,207 @@
 ---
-title: "Closing the gap: how BookMySeat teaches seat races and row locks"
+title: "Closing the gap: safe seat booking with row locks"
 date: "2026-04-19"
-description: "A Turborepo cinema demo where naive booking under load can duplicate rows—and where one Sequelize transaction with pessimistic locks makes Postgres the referee."
+description: "A practical walkthrough of check-then-act races, PostgreSQL row locks, and how BookMySeat avoids double booking under concurrent requests."
 repo: "https://github.com/hemanth5544/BookMySeat"
-image: "/blog/bookmyseat/read-write-gap.svg"
+live: "https://bookmyseat.hemanthr.xyz/"
+image: "/blog/bookmyseat/image.png"
 ---
 
-When I put **[BookMySeat](https://github.com/hemanth5544/BookMySeat)** together, the goal was not another CRUD tutorial. I wanted something you could **feel**: two browsers, one seat, and a backend honest enough to show **where concurrency actually hurts**.
+When I put **[BookMySeat](https://github.com/hemanth5544/BookMySeat)** together, the goal was not another CRUD tutorial. I wanted something you can feel: two browser tabs, one seat, and a backend honest enough to show exactly where concurrency hurts.
 
-The stack is deliberately small: **Bun** runs an **Elysia** API, **Sequelize** talks to **PostgreSQL**, and a **Next.js** app (Tailwind, Radix-style primitives, Framer Motion on the seat tiles) sits in the same **Turborepo**. The UI is a cinema-style map; the lesson lives in two booking paths exposed as a single `POST /shows/:showId/book` with `mode: "unsafe" | "safe"`.
-
----
-
-## The story the unsafe path tells
-
-The “bad” implementation is intentionally familiar: **load the seat**, **pause** (configurable delay so races are visible under test), **flip status to booked**, **insert a booking row**. No transaction wraps the whole thing, and nothing pins the row while you decide.
-
-That is textbook **check-then-act**. Two in-flight requests can both observe `available`, sleep through the same window, and each run `UPDATE` plus `INSERT`. The demo does **not** enforce a unique constraint on `bookings.seatId`, so the database will happily store **more than one booking for the same seat**—which is exactly the kind of integrity break you want to surface in a teaching repo rather than hide.
-
-The API also returns an **anomalies** block on `GET /shows/:showId/seats`: seats where `COUNT(bookings)` is greater than one for the same `seatId`. The Next.js page surfaces that after stress runs so you do not have to tail SQL to prove the point.
-
-![Two overlapping read–write timelines for the same seat](/blog/bookmyseat/read-write-gap.svg)
+> The lesson is simple: the seat row is the source of truth, so the booking decision must happen while that row is locked.
 
 ---
 
-## Why wrapping only part of the work is a half-measure
+## The race condition you can feel
 
-People sometimes hear “use a transaction” and assume the race vanishes. A transaction gives you **atomicity** and a place to **roll back**, but a plain read—depending on isolation—can still be a **non-locking snapshot**. Two transactions can therefore **agree on the past** at the same time unless something forces them to take turns on the **authoritative row** (or you lean on a constraint and a retry story).
+The unsafe path is intentionally familiar. It reads a seat, waits long enough for another request to catch up, then writes the booking result.
 
-So the interesting design question is not “transaction yes/no,” but **which rows are the source of truth for the decision**, and **how you read them** right before you mutate.
+```ts
+// Shape of the unsafe handler.
+const seat = await Seat.findOne({
+  where: { id: seatId, showId },
+})
 
----
+if (!seat || seat.status !== "available") {
+  return conflict("Seat is already booked")
+}
 
-## What “safe” does in this codebase
+await sleep(demoDelayMs)
 
-The safe path is a single **Sequelize-managed transaction**. Inside it, the handler loads the requested seats with **`lock: t.LOCK.UPDATE`**, which maps to PostgreSQL’s **`SELECT … FOR UPDATE`** behavior on those rows.
+await seat.update({ status: "booked" })
+await Booking.create({ seatId, userId })
+```
 
-Roughly:
+That is textbook **check-then-act**. Two in-flight requests can both observe `available`, sleep through the same window, and each run the update plus insert.
 
-1. Open a transaction.
-2. `findAll` the target seats **for this show**, with **`FOR UPDATE`** so competitors block on the same inventory.
-3. Verify count and `status === "available"` while the lock is held.
-4. Update each seat to `booked` and create `bookings` rows **in the same transaction**.
-5. Commit.
+### What breaks
 
-If another client got there first, the re-check fails and the handler returns a **409-style conflict** instead of silently stacking duplicate bookings. The critical section is short: no artificial sleep in the safe path, because the point is **correctness under contention**, not simulating human latency inside the lock.
+The demo does not enforce a unique constraint on `bookings.seatId`, because hiding the failure would make the lesson weaker. After a stress run, the API can report duplicated booking rows for the same seat.
 
----
+```sql
+SELECT "seatId", COUNT(*) AS "bookingCount"
+FROM bookings
+GROUP BY "seatId"
+HAVING COUNT(*) > 1;
+```
 
-## Trade-offs you should name out loud
+The page surfaces those anomalies after unsafe stress runs, so you do not have to tail SQL logs to prove the point.
 
-**Throughput on a hot seat** goes down when everyone queues on the same row lock—that is the cost of correctness for a finite resource. For a full auditorium you usually contend **per seat**, which scales better than one global mutex for the entire hall.
-
-If you lock **multiple seats** (for example a cart of four), define a **stable lock order** (sort seat IDs ascending) before acquiring locks so you do not invite deadlocks.
-
-Keep transactions **tight**: no slow external APIs, no user-facing prompts, no “fetch PDF while holding the row.”
-
----
-
-## Neighbors on the shelf (briefly)
-
-BookMySeat focuses on **pessimistic row locks inside a transaction** because it maps cleanly to “this seat is the thing we are fighting over.”
-
-Other patterns belong in the same mental drawer:
-
-- A **`UNIQUE (seat_id)`** (or composite with show/time) is an excellent **backstop**: the app should still try to do the right thing, but the database refuses double-sell if something slips.
-- **Optimistic locking** with a `version` column is pleasant when conflicts are rare; cinemas on opening night are not always that world.
-- **Stricter isolation** can catch anomalies but often surfaces as **retries**; you still want an explicit story for **which rows** represent the seat.
+![Two overlapping read-write timelines for the same seat](/blog/bookmyseat/image.png)
 
 ---
 
-## How to play with it locally
+## A transaction is necessary, but not enough
 
-Clone the repo, create a Postgres database, copy `.env.example` into `apps/server/.env`, run **`npm run db:seed -w server`**, then start **`npm run dev`** (or run the server and web workspaces separately). The UI includes a **stress** control that fires parallel **unsafe** requests against one available seat—afterwards, refresh and watch **anomalies** light up unless you reset the demo.
+People sometimes hear "use a transaction" and assume the race vanishes. A transaction gives you atomicity and a place to roll back, but a plain read can still be a non-locking snapshot depending on isolation level.
 
-If you want a deeper dive later—exact isolation-level notes, lock ordering for multi-seat carts, or a k6 script against `/book`—those can be short follow-ups. For now, the implementation in `apps/server/src/book.ts` is the ground truth next to this narrative.
+| Tool | What it gives you | What it does not guarantee alone |
+| --- | --- | --- |
+| Transaction | Commit or roll back a unit of work | That competing requests take turns before deciding |
+| Plain `SELECT` | A view of current data | Ownership of the row you are about to mutate |
+| `SELECT ... FOR UPDATE` | A row-level write lock | Infinite throughput on one hot seat |
+
+So the important question is not just "transaction yes or no?" It is: **which rows represent the decision, and how do you read them right before you mutate?**
+
+---
+
+## The safe path: lock before deciding
+
+The safe path uses a single Sequelize-managed transaction. Inside it, the handler loads the requested seats with `lock: t.LOCK.UPDATE`, which maps to PostgreSQL row locking.
+
+```ts
+await sequelize.transaction(async (t) => {
+  const seats = await Seat.findAll({
+    where: {
+      id: seatIds,
+      showId,
+    },
+    order: [["id", "ASC"]],
+    transaction: t,
+    lock: t.LOCK.UPDATE,
+  })
+
+  if (seats.length !== seatIds.length) {
+    throw new BookingConflict("Some seats were not found")
+  }
+
+  const unavailable = seats.find((seat) => seat.status !== "available")
+
+  if (unavailable) {
+    throw new BookingConflict("One or more seats are already booked")
+  }
+
+  await Promise.all(
+    seats.map((seat) =>
+      seat.update({ status: "booked" }, { transaction: t })
+    )
+  )
+
+  await Booking.bulkCreate(
+    seats.map((seat) => ({ seatId: seat.id, userId })),
+    { transaction: t }
+  )
+})
+```
+
+### What PostgreSQL is doing
+
+At the database level, the important part looks like this:
+
+```sql
+SELECT *
+FROM seats
+WHERE "showId" = $1
+  AND id IN ($2, $3, $4)
+ORDER BY id ASC
+FOR UPDATE;
+```
+
+If another request is trying to book the same seat, it has to wait. When it resumes, it re-checks the seat status inside its own transaction and returns a conflict instead of stacking another booking row.
+
+```json
+{
+  "status": 409,
+  "message": "One or more seats are already booked"
+}
+```
+
+---
+
+## Keep the critical section tight
+
+Row locks trade raw throughput for correctness on a finite resource. That is the right trade when the resource is a real seat, but the lock should be held for the shortest useful time.
+
+- Lock only the rows that matter for the booking decision.
+- Re-check availability while the lock is held.
+- Update the seats and create booking rows in the same transaction.
+- Avoid external APIs, email, PDFs, payment redirects, or user prompts inside the transaction.
+
+For a full auditorium, contention is usually per seat. That scales much better than one global mutex for the whole show.
+
+---
+
+## Multi-seat carts need lock ordering
+
+If a user can book four seats together, sort the seat IDs before locking them. Stable ordering keeps two transactions from locking the same rows in opposite directions.
+
+```ts
+const seatIds = requestedSeatIds
+  .map(Number)
+  .sort((a, b) => a - b)
+```
+
+The rule is boring in the best possible way: every request asks for locks in the same order.
+
+---
+
+## Add a database backstop
+
+The app should try to do the right thing, but the database should still refuse impossible state. In a production version, I would add a uniqueness rule around the booking target.
+
+```sql
+ALTER TABLE bookings
+ADD CONSTRAINT bookings_unique_seat
+UNIQUE ("seatId");
+```
+
+If the same physical seat can appear across multiple shows or times, make the constraint match that real identity instead.
+
+```sql
+ALTER TABLE bookings
+ADD CONSTRAINT bookings_unique_show_seat
+UNIQUE ("showId", "seatId");
+```
+
+That gives the system a final guardrail even if a future code path forgets the locking story.
+
+---
+
+## Try it locally
+
+Clone the repo, create a Postgres database, copy `.env.example` into `apps/server/.env`, seed the database, and start the app.
+
+```bash
+git clone https://github.com/hemanth5544/BookMySeat
+cd BookMySeat
+npm install
+npm run db:seed -w server
+npm run dev
+```
+
+Then open the UI and run the unsafe stress control against one available seat. Refresh the page and watch the anomalies panel light up. Reset the demo, switch to the safe path, and the same kind of contention should resolve as conflicts instead of duplicated bookings.
+
+---
+
+## What to remember
+
+BookMySeat is small on purpose, but the rule generalizes well:
+
+1. Find the row that represents the scarce thing.
+2. Read that row inside a transaction with a lock.
+3. Re-check the business condition after the lock is acquired.
+4. Mutate the state and write related records before commit.
+5. Keep a database constraint as the last line of defense.
+
+The implementation in `apps/server/src/book.ts` is the ground truth next to this narrative.
