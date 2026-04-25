@@ -209,8 +209,8 @@ export default function Page() {
                   
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">
                     
-                     <span itemProp="jobTitle">Software Enginner</span> at{" "}
-                    <span className="text-zinc-900 dark:text-white font-medium" itemProp="worksFor">Datopic</span>
+                     {/* <span itemProp="jobTitle">Software Enginner</span> at{" "} */}
+                    {/* <span className="text-zinc-900 dark:text-white font-medium" itemProp="worksFor">Datopic</span> */}
                   </p>
                   
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">
