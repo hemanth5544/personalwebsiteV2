@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { ArrowUp, Check, Copy, ExternalLink, ListTree, Terminal } from "lucide-react"
+import { ArrowUp, Check, Copy, ExternalLink, ListTree } from "lucide-react"
 
 const motionTags = {
   article: motion.article,
@@ -11,17 +11,6 @@ const motionTags = {
   header: motion.header,
   nav: motion.nav,
   section: motion.section,
-}
-
-const languageLabels = {
-  bash: "Bash",
-  js: "JavaScript",
-  javascript: "JavaScript",
-  json: "JSON",
-  sql: "SQL",
-  text: "Text",
-  ts: "TypeScript",
-  typescript: "TypeScript",
 }
 
 export function BlogMotion({ as = "div", children, className = "", delay = 0 }) {
@@ -41,8 +30,6 @@ export function BlogMotion({ as = "div", children, className = "", delay = 0 }) 
 
 export function BlogCodeBlock({ code, language = "text" }) {
   const [copied, setCopied] = useState(false)
-  const normalizedLanguage = language.toLowerCase()
-  const label = languageLabels[normalizedLanguage] ?? normalizedLanguage.toUpperCase()
   const cleanCode = code.replace(/\n$/, "")
 
   async function copyCode() {
@@ -56,38 +43,23 @@ export function BlogCodeBlock({ code, language = "text" }) {
   }
 
   return (
-    <motion.figure
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="my-8 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-[0_18px_60px_rgba(24,24,27,0.08)] dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-[0_18px_60px_rgba(0,0,0,0.25)]"
-    >
-      <div className="flex min-h-11 items-center justify-between gap-3 border-b border-zinc-200 bg-zinc-100/80 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900/90">
-        <div className="flex min-w-0 items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-          <span className="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-200 bg-white text-emerald-600 dark:border-zinc-700 dark:bg-zinc-950 dark:text-emerald-400">
-            <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
-          </span>
-          <span className="truncate">{label}</span>
-        </div>
-        <button
-          type="button"
-          onClick={copyCode}
-          className="inline-flex h-8 items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2.5 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:text-zinc-950 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
-          aria-label={copied ? "Copied code" : "Copy code"}
-        >
-          {copied ? (
-            <Check className="h-3.5 w-3.5 text-emerald-500" aria-hidden="true" />
-          ) : (
-            <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-          )}
-          <span>{copied ? "Copied" : "Copy"}</span>
-        </button>
-      </div>
-      <pre className="blog-code-pre overflow-x-auto bg-[#fff9ea] p-4 text-[0.9rem] leading-7 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:p-5">
+    <figure className="blog-code-block group relative my-8">
+      <button
+        type="button"
+        onClick={copyCode}
+        className="absolute right-3 top-3 rounded p-1 text-zinc-400 opacity-0 transition hover:text-zinc-700 focus:opacity-100 group-hover:opacity-100 dark:text-zinc-500 dark:hover:text-zinc-300"
+        aria-label={copied ? "Copied code" : "Copy code"}
+      >
+        {copied ? (
+          <Check className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
+        ) : (
+          <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+        )}
+      </button>
+      <pre className="overflow-x-auto">
         <code>{cleanCode}</code>
       </pre>
-    </motion.figure>
+    </figure>
   )
 }
 

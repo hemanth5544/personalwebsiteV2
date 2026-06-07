@@ -2,6 +2,18 @@ import Link from "next/link"
 import { BlogCodeBlock } from "@/components/blog-interactions"
 import { createHeadingSlugger } from "@/lib/blog"
 
+function BlogReplGrid({ children }) {
+  return <div className="blog-repl-grid">{children}</div>
+}
+
+function BlogReplIn({ children }) {
+  return <div className="repl-in">{children}</div>
+}
+
+function BlogReplOut({ children }) {
+  return <div className="repl-out">{children}</div>
+}
+
 function isExternal(href) {
   return href?.startsWith("http://") || href?.startsWith("https://") || href?.startsWith("//")
 }
@@ -22,6 +34,9 @@ export function blogMdxComponents() {
   const headingSlug = createHeadingSlugger()
 
   return {
+    ReplGrid: BlogReplGrid,
+    ReplIn: BlogReplIn,
+    ReplOut: BlogReplOut,
     h2: ({ children, ...props }) => {
       const text = getTextContent(children)
       const id = headingSlug(text)
@@ -73,7 +88,7 @@ export function blogMdxComponents() {
       <img
         alt={alt ?? ""}
         src={src}
-        className="my-8 h-auto w-full rounded-lg border border-zinc-200 bg-white object-contain shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:brightness-[0.98]"
+        className="blog-mdx-img my-8 h-auto w-full object-contain sm:max-w-[14rem] md:float-right md:ml-6 md:mb-4 md:w-48 lg:w-52"
         loading="lazy"
         {...props}
       />
