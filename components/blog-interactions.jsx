@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
 import { ArrowUp, Check, Copy, ExternalLink, ListTree } from "lucide-react"
+import { getLanguageLabel, highlightCode } from "@/lib/blog-highlight"
 
 const motionTags = {
   article: motion.article,
@@ -31,6 +32,11 @@ export function BlogMotion({ as = "div", children, className = "", delay = 0 }) 
 export function BlogCodeBlock({ code, language = "text" }) {
   const [copied, setCopied] = useState(false)
   const cleanCode = code.replace(/\n$/, "")
+  const label = getLanguageLabel(language)
+  const highlighted = useMemo(
+    () => highlightCode(cleanCode, language),
+    [cleanCode, language],
+  )
 
   async function copyCode() {
     try {
@@ -43,22 +49,27 @@ export function BlogCodeBlock({ code, language = "text" }) {
   }
 
   return (
-    <figure className="blog-code-block group relative my-8">
-      <button
-        type="button"
-        onClick={copyCode}
-        className="absolute right-3 top-3 rounded p-1 text-zinc-400 opacity-0 transition hover:text-zinc-700 focus:opacity-100 group-hover:opacity-100 dark:text-zinc-500 dark:hover:text-zinc-300"
-        aria-label={copied ? "Copied code" : "Copy code"}
-      >
-        {copied ? (
-          <Check className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
-        ) : (
-          <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-        )}
-      </button>
-      <pre className="overflow-x-auto">
-        <code>{cleanCode}</code>
-      </pre>
+    <figure className="blog-code-block group my-8">
+      <div className="blog-code-shell">
+        <div className="blog-code-toolbar">
+          <span className="blog-code-lang">{label}</span>
+          <button
+            type="button"
+            onClick={copyCode}
+            className="blog-code-copy"
+            aria-label={copied ? "Copied code" : "Copy code"}
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+            )}
+          </button>
+        </div>
+        <pre className="blog-code-inner">
+          <code dangerouslySetInnerHTML={{ __html: highlighted }} />
+        </pre>
+      </div>
     </figure>
   )
 }
